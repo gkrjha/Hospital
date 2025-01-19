@@ -2,6 +2,11 @@ import { DataTypes } from "sequelize";
 import sequelize from "../config/dbConfig.js";
 import bcrypt from "bcryptjs"
 const Patient = sequelize.define("Patient", {
+    paitentID: {
+        type: DataTypes.UUID,
+        primaryKey: true,
+        defaultValue: DataTypes.UUIDV4,
+    },
     firstname: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -30,17 +35,17 @@ const Patient = sequelize.define("Patient", {
             isEmail: true,
         },
     },
-    phone: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
     password: {
         type: DataTypes.STRING,
         allowNull: false,
         set(value) {
-            const hashpassword = bcrypt.hashSync(value, 10)
+            const hashpassword = bcrypt.hashSync(value, 12);
             this.setDataValue('password', hashpassword)
         }
+    },
+    phone: {
+        type: DataTypes.STRING,
+        allowNull: false,
     },
     gender: {
         type: DataTypes.ENUM("M", "F", "O"),
@@ -49,9 +54,11 @@ const Patient = sequelize.define("Patient", {
     age: {
         type: DataTypes.INTEGER,
         allowNull: false
+    },
+    appoinment: {
+        type: DataTypes.STRING,
+        allowNull: true,
     }
-}, {
-   
-});
+},{timestamps:true});
 
 export default Patient;
