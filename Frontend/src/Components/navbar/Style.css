@@ -1,0 +1,156 @@
+.main-container {
+    margin-top: 20px;
+    margin-left: 80px;
+    margin-right: 80px;
+    
+}
+
+.container-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    align-items: center;
+}
+
+.logo {
+    height: 5vh;
+    
+}
+
+.logo a img {
+    height: 5vh;
+}
+
+.navbar {
+    display: flex;
+    
+}
+
+.nav-item {
+    display: flex;
+    gap: 40px;
+    font-size: 1.1rem;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    align-items: center;
+}
+
+.nav-item ul {
+    white-space: nowrap;
+    color: #909090;
+    list-style: none;
+    display: flex;
+    gap: 20px;
+}
+
+a {
+    text-decoration: none;
+}
+
+.nav-item a{
+    background-color: rgb(233, 172, 50);
+    padding: 13px;
+    border-radius: 10px;
+    color: white;
+}
+
+
+/* -------------------------------FOOTER----------------------- */
+
+.parent{
+    
+    padding: 10px;
+    height: 60vh;
+    width: 100%;
+    color: white;
+    justify-content: space-between;
+    background-color: rgb(3, 3, 67);
+    display: flex;
+    flex-direction: column;
+}
+.footer-item{
+    justify-content: space-between;
+    display: flex;
+    /* align-items: center; */
+}
+.footer-item-1{
+    font-size: 1.1rem;
+    margin-top: 32px;
+    margin-left: 40px;
+    width: 31%;
+    display: flex;
+    font-weight: 600;
+    font-family: Arial, Helvetica, sans-serif;
+    /* align-items: center; */
+    gap: 3px;
+}
+.footer-item-1 img{
+    height: 5vh;
+}
+.footer-item-1 p{
+    margin-left: 2px;
+}
+
+.footer-item-2{
+    margin-top: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    color: rgb(186, 159, 4);
+}
+.footer-item-2 ul{
+    list-style: none;
+    display: flex;
+    color: white;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.footer-item-2 ul li{
+    gap: 4px;
+    font-size: 1.3rem;
+    margin: 10px;
+}
+
+
+
+.footer-item-3 {
+    margin-top: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    color: rgb(186, 159, 4);
+}
+
+.footer-item-3 ul {
+    list-style: none;
+    display: flex;
+    color: white;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.footer-item-3 ul li {
+    display: flex;
+    gap: 10px;
+    font-size: 1.3rem;
+    margin: 10px;
+}
+.address{
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+
+    align-items: center;
+}
+.copyright{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+hr{
+    width: 80%;
+}
+.copyright h1{
+    font-size: 1.2rem;
+}

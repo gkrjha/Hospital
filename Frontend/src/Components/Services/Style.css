@@ -1,0 +1,23 @@
+.main-containers {
+  height: auto;
+}
+
+.service-container {
+    display: flex;
+    align-items: flex-end;
+    padding: 30px;
+    background: linear-gradient(white, rgb(219, 216, 216));
+    border-radius: 0 0 60px 60px;
+    justify-content: space-between;
+}
+
+.conatiner-1 {
+    padding: 40px;
+    margin: 30px;
+    font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    font-size: 2rem;
+}
+span{
+    padding: 2px;
+    font-size: 1rem;
+}
