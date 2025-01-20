@@ -55,10 +55,20 @@ const Patient = sequelize.define("Patient", {
         type: DataTypes.INTEGER,
         allowNull: false
     },
-    appoinment: {
+    appointment: {
         type: DataTypes.STRING,
         allowNull: true,
-    }
+    },
+    doctorId: {
+        type: DataTypes.UUID,
+        references: {
+            model: 'Doctors',
+            key: 'doctorId'
+        },
+        allowNull: true, 
+    },
+
+
 },{timestamps:true});
 
 export default Patient;

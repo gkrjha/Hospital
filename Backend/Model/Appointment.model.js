@@ -1,29 +1,40 @@
-import sequelize from "../config/dbConfig";
+// In the Appointment model
+import sequelize from "../config/dbConfig.js";
 import { DataTypes } from "sequelize";
-import Patient from "./patient.model";
-import Doctor from "./Doctor.model";
 
 const Appointment = sequelize.define("Appointment", {
-    patientid: {
-        type: DataTypes.INTEGER,  // Should be integer, to reference Patient's 'id'
+    patientID: {
+        type: DataTypes.UUID,
         allowNull: false,
         references: {
             model: 'Patients',
-            key: 'id',
+            key: 'paitentID',
         },
     },
-    doctorid: {
-        type: DataTypes.INTEGER,  // Should be integer, to reference Doctor's 'id'
+    doctorId: {
+        type: DataTypes.UUID,
         allowNull: false,
         references: {
             model: 'Doctors',
-            key: 'id',
+            key: 'doctorId',
         },
     },
     date: {
-        type: DataTypes.DATE,  // Use DATE type for date/time fields
+        type: DataTypes.DATE,
         allowNull: false,
     },
 });
+
+Appointment.associate = (models) => {
+    Appointment.belongsTo(models.Patient, {
+        foreignKey: 'patientID',
+        targetKey: 'paitentID',
+    });
+
+    Appointment.belongsTo(models.Doctor, {
+        foreignKey: 'doctorId',
+        targetKey: 'doctorId',
+    });
+};
 
 export default Appointment;

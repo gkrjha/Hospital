@@ -1,21 +1,22 @@
 import jwt from "jsonwebtoken";
 
 
-const verifyToken = (req, res, next) => {
-    const token = req.headers["authorization"]?.split(" ")[1];
 
+const verifyToken = (req, res, next) => {
+    const token = req.header('Authorization')?.replace('Bearer ', '');
     if (!token) {
-        return res.status(403).json({ error: "Access denied, token required" });
+        return res.status(401).json({ message: 'Authentication required' });
     }
 
     try {
-        const decoded = jwt.verify(token, "your_secret_key");
-        req.user = decoded; 
+        const decoded = jwt.verify(token, process.env.JWT_TOKEN);
+        req.user = decoded;
         next();
-    } catch (error) {
-        return res.status(401).json({ error: "Invalid token" });
+    } catch (err) {
+        return res.status(401).json({ message: 'Invalid or expired token' });
     }
 };
+
 
 
 const ErrorHandler = (err, req, res, next) => {
