@@ -1,0 +1,95 @@
+
+.cont {
+    height: 70vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+ 
+  .appoint-form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.9); 
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    width: 400px;
+    max-width: 100%;
+  }
+  
+
+  .form-groups {
+    margin-bottom: 20px;
+  }
+  
+
+  label {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+    display: block;
+  }
+  
+
+  .form-input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: border-color 0.3s;
+  }
+  
+
+  
+
+  .form-error {
+    color: #ff6347; 
+    font-size: 12px;
+    margin-top: 5px;
+  }
+
+  .appoint-button {
+    background-color: #4caf50; 
+    color: #fff;
+    padding: 12px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.3s;
+  }
+  
+
+  .appoint-button:hover {
+    background-color: #45a049;
+  }
+
+  .auth-form-input {
+    margin-bottom: 10px;
+  }
+  
+
+  
+
+  .form-error {
+    color: #ff6347;
+    font-size: 12px;
+    margin-top: 5px;
+  }
+
+  .form-input:focus {
+    outline: none;
+    border-color: #4caf50; 
+  }
+  
+  button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+  
+  

@@ -1,40 +1,45 @@
-// In the Appointment model
 import sequelize from "../config/dbConfig.js";
 import { DataTypes } from "sequelize";
+import Patient_Details from "./Patient.model.js";
+import Doctor_detail from "./Doctor.model.js";
 
-const Appointment = sequelize.define("Appointment", {
-    patientID: {
+const Appointment = sequelize.define("appointment", {
+    AppointmentId: {
+        type: DataTypes.UUID,
+        primaryKey: true,
+        defaultValue: DataTypes.UUIDV4,
+        allowNull: false
+    },
+    PatientId: {  
         type: DataTypes.UUID,
         allowNull: false,
         references: {
-            model: 'Patients',
-            key: 'paitentID',
+            model: 'patient_details',
+            key: 'PatientID'
         },
     },
-    doctorId: {
+    DoctorId: {
         type: DataTypes.UUID,
         allowNull: false,
         references: {
-            model: 'Doctors',
-            key: 'doctorId',
+            model: 'doctor_details',
+            key: 'DoctorID'
         },
     },
     date: {
         type: DataTypes.DATE,
         allowNull: false,
     },
+    status: {
+        type: DataTypes.ENUM("Confirm", "Pending", "Done"),
+        allowNull: true,
+        defaultValue: "Pending"
+    },
+    specialization:{
+        type: DataTypes.STRING,
+        allowNull: false,
+    }
 });
 
-Appointment.associate = (models) => {
-    Appointment.belongsTo(models.Patient, {
-        foreignKey: 'patientID',
-        targetKey: 'paitentID',
-    });
-
-    Appointment.belongsTo(models.Doctor, {
-        foreignKey: 'doctorId',
-        targetKey: 'doctorId',
-    });
-};
 
 export default Appointment;

@@ -2,21 +2,20 @@ import React from 'react'
 import { FaLocationDot } from "react-icons/fa6";
 import { FaPhone } from "react-icons/fa";
 import { FaClock } from "react-icons/fa6";
-
-import "./Style.css"
+import "./Navbar.css"
 const Footer = () => {
     return (
-        <footer className='parent'>
+        <footer className="footer">
             <div className='footer-item'>
-                <div className='footer-item-1'>
+                <div className='footer-logo'>
                     <img src="https://infyhms.sgp1.cdn.digitaloceanspaces.com/638/Graphics.png" alt="Infy HMS" className="img-fluid"></img>
-                    <p>
+                    <p className='ml-1.5'>
                         Over past 10+ years of experience and skills in various technologies, we built great scalable produc
                     </p>
                 </div>
-                <div className='footer-item-2'>
+                <div className='footer-item-1'>
                     <h1>Useful Links</h1>
-                    <ul>
+                    <ul className='list-items'>
                         <li>Home</li>
                         <li>Service</li>
                         <li>Doctor</li>
@@ -24,9 +23,9 @@ const Footer = () => {
                         <li>Contact</li>
                     </ul>
                 </div>
-                <div className='footer-item-3'>
+                <div className='footer-item-2'>
                     <h1>Contact Information</h1>
-                    <ul>
+                    <ul className='footer-contact'>
                         <li>
                             <i>
                                 <FaPhone />
@@ -51,10 +50,6 @@ const Footer = () => {
                         </li>
                     </ul>
                 </div>
-            </div>
-            <div className='copyright'>
-                <hr />
-                <h1>Copyright © 2025 All Rights Reserved by HMS</h1>
             </div>
         </footer>
     )

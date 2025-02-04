@@ -1,46 +1,31 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../config/dbConfig.js";
-import Appointment from "./Appointment.model.js";
-import Patient from "./patient.model.js";
-import bcrypt from 'bcryptjs';
+import User from "./User.model.js";
 
-const Doctor = sequelize.define("Doctor", {
-    doctorId: {
+const Doctor_detail = sequelize.define("doctor_details", {
+    DoctorID: {
         type: DataTypes.UUID,
         primaryKey: true,
         defaultValue: DataTypes.UUIDV4,
+        allowNull: false
+    },
+    user_ID: {
+        type: DataTypes.UUID,
         allowNull: false,
         unique: true,
-    },
-    name: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
-    email: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true,
-        validate: {
-            isEmail: true,
+        references: {
+            model: 'users',
+            key: 'UniqueId',  
         },
-    },
-    password: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        set(value) {
-
-            const hashPassword = bcrypt.hashSync(value, 12);
-            this.setDataValue('password', hashPassword);
-        }
     },
     specialization: {
         type: DataTypes.STRING,
         allowNull: false,
-    }
+    },
+}, {
+    timestamps: true
 });
 
-// Associations
-Doctor.hasMany(Appointment, { foreignKey: 'doctorId' });
-Doctor.hasMany(Patient, { foreignKey: 'doctorId' });
 
-export default Doctor;
+
+export default Doctor_detail;

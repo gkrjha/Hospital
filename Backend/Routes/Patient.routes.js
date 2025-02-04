@@ -1,7 +1,11 @@
 import express from "express";
-import { login, signup } from "../Controller/Usercontroller.js";  
-const userRoute = express.Router();
-userRoute.post("/", signup);
-userRoute.post("/login",login)
+import { verifyToken } from '../Middlewares/TokenVerification.js'
+import isAdmin from '../Middlewares/Authentication.js'
+import { findOne, getAllPatients,createPatient} from "../Controller/Patient.controller.js";
+const patientRoute = express.Router();
 
-export default userRoute;
+patientRoute.post('/',createPatient)
+patientRoute.get("/:id", findOne);
+patientRoute.get("/",getAllPatients);
+
+export default patientRoute;
