@@ -4,9 +4,10 @@ import { Formik, Field, ErrorMessage } from "formik";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./Auth.css";
+
 const loginInitialValues = {
   email: "",
-  password: "",    
+  password: "",
 };
 
 const validationSchema = yup.object({
@@ -18,22 +19,8 @@ const validationSchema = yup.object({
 });
 
 const Auth = () => {
-  const [role, setRole] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (role) {
-      console.log("Updated role:", role);
-      if (role === "Admin") {
-        navigate("/admin");
-      } else if (role === "Doctor") {
-        navigate("/doctor");
-      } else if (role === "Patient") {
-        navigate("/patient");
-      }
-    }
-  }, [role, navigate]);
 
   const handleLoginSubmit = async (values) => {
     try {
@@ -42,13 +29,19 @@ const Auth = () => {
         values
       );
 
-     
       localStorage.setItem("token", response.data.token);
-      console.log("Token stored:", response.data.token);
-
-      setRole(response.data.user.role);
+      localStorage.setItem("user", JSON.stringify(response.data.user));
 
       console.log("Login Success:", response.data);
+
+      const userRole = response.data.user.role;
+      if (userRole === "Admin") {
+        navigate("/admin");
+      } else if (userRole === "Doctor") {
+        navigate("/doctor");
+      } else if (userRole === "Patient") {
+        navigate("/patient");
+      }
     } catch (error) {
       console.error("Error:", error.response?.data || error.message);
       setErrorMessage(
@@ -60,7 +53,6 @@ const Auth = () => {
   return (
     <div className="auth-form-container">
       <h2>Login</h2>
-    
       {errorMessage && <div className="form-error">{errorMessage}</div>}
 
       <Formik
@@ -70,32 +62,39 @@ const Auth = () => {
       >
         {({ handleSubmit }) => (
           <div className="form-cont">
-          <form className="auth-form" onSubmit={handleSubmit}>
-            <div className="form-group">
-              <label>Email</label>
-              <div className="auth-form-input">
-              <Field type="email" name="email" className="form-input"/>
-              <ErrorMessage name="email" component="div" className="form-error" />
+            <form className="auth-form" onSubmit={handleSubmit}>
+              <div className="form-group">
+                <label>Email</label>
+                <div className="auth-form-input">
+                  <Field type="email" name="email" className="form-input" />
+                  <ErrorMessage
+                    name="email"
+                    component="div"
+                    className="form-error"
+                  />
+                </div>
               </div>
-              
-            </div>
 
-            <div className="form-group">
-              <label>Password</label>
-              <div className="auth-form-input">
-              <Field type="password" name="password" className="form-input" />
-              <ErrorMessage
-                name="password"
-                component="div"
-                className="form-error"
-              />
+              <div className="form-group">
+                <label>Password</label>
+                <div className="auth-form-input">
+                  <Field
+                    type="password"
+                    name="password"
+                    className="form-input"
+                  />
+                  <ErrorMessage
+                    name="password"
+                    component="div"
+                    className="form-error"
+                  />
+                </div>
               </div>
-            </div>
 
-            <button type="submit" className="auth-form-button">
-              Login
-            </button>
-          </form>
+              <button type="submit" className="auth-form-button">
+                Login
+              </button>
+            </form>
           </div>
         )}
       </Formik>

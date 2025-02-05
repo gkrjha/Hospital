@@ -54,7 +54,7 @@ const SendPassword = async (email, name, password) => {
   }
 };
 
-// Login function
+
 const login = async (req, res) => {
   const { email, password } = req.body;
 
@@ -85,7 +85,7 @@ const login = async (req, res) => {
   }
 };
 
-// Count Doctors
+
 export const CountDoctor = async (req, res) => {
   try {
     const count = await User.count({ where: { role: "Doctor" } });
@@ -95,7 +95,7 @@ export const CountDoctor = async (req, res) => {
   }
 };
 
-// Count Patients
+
 export const CountPatient = async (req, res) => {
   try {
     const count = await User.count({ where: { role: "Patient" } });
@@ -105,7 +105,7 @@ export const CountPatient = async (req, res) => {
   }
 };
 
-// Get All Doctors
+
 export const getDoctor = async (req, res) => {
   try {
     const doctors = await User.findAll({ where: { role: "Doctor" } });
@@ -115,7 +115,7 @@ export const getDoctor = async (req, res) => {
   }
 };
 
-// Get All Patients
+
 export const getPatient = async (req, res) => {
   try {
     const patients = await User.findAll({ where: { role: "Patient" } });
@@ -125,7 +125,6 @@ export const getPatient = async (req, res) => {
   }
 };
 
-// Delete User
 export const deleteUser = async (req, res) => {
   try {
     const { id } = req.params;
@@ -154,7 +153,7 @@ export const deleteUser = async (req, res) => {
   }
 };
 
-// Signup Function
+
 const signup = async (req, res) => {
   const { name, email, role, phone ,age,gender,specialization} = req.body;
   console.log(specialization);

@@ -1,0 +1,88 @@
+/* DoctorCard.css */
+.doctor {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    margin: 20px auto;
+  }
+  
+  .doctor-details {
+    margin-bottom: 20px;
+  }
+  
+  .margin {
+    margin: 10px 0;
+  }
+  
+  .doctor-name {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+  }
+  
+  .doctor-name label {
+    font-weight: 600;
+    color: #333;
+  }
+  
+  .doctor-name span {
+    color: #555;
+    font-size: 1rem;
+  }
+  
+  .doctor-name div {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+  }
+  
+  .appointment-details {
+    text-align: center;
+  }
+  
+  .appointment-details h1 {
+    font-size: 1.5rem;
+    color: #333;
+    margin-bottom: 15px;
+  }
+  
+  .appointment-details button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .appointment-details button:hover {
+    background-color: #0056b3;
+  }
+  
+  @media screen and (max-width: 768px) {
+    .doctor {
+      width: 90%;
+    }
+  
+    .doctor-name {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  
+    .doctor-name span {
+      margin-top: 5px;
+    }
+  
+    .appointment-details button {
+      width: 100%;
+      padding: 12px;
+    }
+  }
+  

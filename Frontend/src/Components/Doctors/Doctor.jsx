@@ -1,12 +1,36 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./Doctor.css";
 import DoctorCard from "../Content/DoctorCard";
+
 const Doctor = () => {
+  const [doctorData, setDoctorData] = useState(null);
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    console.log(user);
+    if (user) {
+      setDoctorData(user);
+    }
+  }, []);
+
   return (
-    <>
-    <DoctorCard button="Get Appointment"/>
-    </>
+    <div>
+     
+      {doctorData ? (
+        <DoctorCard
+          doctor={doctorData}
+          button={
+            doctorData.role === "Doctor"
+              ? "Get Appointment"
+              : "Create Appointment"
+          }
+        />
+      ) : (
+        <></>
+      )}
+    </div>
   );
 };
 
 export default Doctor;
+

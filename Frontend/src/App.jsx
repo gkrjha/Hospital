@@ -14,6 +14,7 @@ import { RegistrationForm } from "./Components/Auth/Signup";
 import Doctorlist from "./Components/Doctors/Doctorlist";
 import Patientlist from "./Components/Patient/Patientlist";
 import Appointment from "./Components/Appointment/Appointment";
+import AppointList from "./Components/Appointment/AppointList";
 function App() {
   const route = createBrowserRouter([
     {
@@ -102,6 +103,16 @@ function App() {
         <>
           <Header />
          <Appointment />
+          <Footer />
+        </>
+      ) 
+    },
+    {
+      path:"/appointlist",
+      element: (
+        <>
+          <Header />
+         <AppointList />
           <Footer />
         </>
       ) 

@@ -1,50 +1,42 @@
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import React from 'react';
 import "./DoctorCard.css"
-const DoctorCard = ({button,...props}) => {
-  const [role,setRole] = useState("")
+import { useNavigate } from 'react-router-dom';
+const DoctorCard = ({ doctor, button }) => {
   const navigate = useNavigate();
+
   return (
-    <div className="docotr">
-    <div className="doctor-details">
-      <div className="margin">
-        <div className="doctor-name">
-          <label>Name:</label>
-          <span>Gaurav Kumar</span>
+    <div className="doctor">
+      <div className="doctor-details">
+        <div className="margin">
+          {
+            doctor.role =="Doctor" ?(<>DOCTOR</>):(<>PATIENT</>)
+          }
+          <div className="doctor-name">
+            <label>Name:</label>
+            <span>{doctor.name}</span>
+          </div>
+          <div className="doctor-name">
+            <label>Phone:</label>
+            <span>{doctor.phone}</span>
+          </div>
+          <div className="doctor-name">
+            <label>Email:</label>
+            <span>{doctor.email}</span>
+          </div>
         </div>
-        <div className="doctor-name">
-          <label>Phone:</label>
-          <span>7589745696</span>
-        </div>
-        <div className="doctor-name">
-          <label>Email:</label>
-          <span>18gauravkr@gmail.com</span>
-        </div>
+      </div>
+
+      <div className="appointment-details">
+        <h1>APPOINTMENT</h1>
         {
-          role==="Doctor" ? (<div className="doctor-name">
-          <label>Speclization:</label>
-          <span>Nuro</span>
-        </div>):(<div className="doctor-name">
-          <div>
-          <label>Age:</label>
-          <span>22</span>
-          </div>
-          <div>
-          <label>Gender:</label>
-          <span>Male</span>
-          </div>
-          
-        </div>)
+          doctor.role =="Doctor"?(<><button type="button" onClick={() => { navigate("/appointlist") }}>{button}</button></>):(<><button type="button" onClick={() => { navigate("/appointment") }}>{button}</button></>)
         }
         
       </div>
     </div>
-    <div className="appointment-details">
-      <h1>APPOIENTMENT</h1>
-      <button type="button" onClick={()=>{navigate("/appointment")}}>{button}</button>
-    </div>
-  </div>
-  )
-}
+  );
+};
 
-export default DoctorCard
+export default DoctorCard;
+
+

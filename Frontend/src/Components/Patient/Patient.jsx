@@ -1,15 +1,35 @@
-import React from 'react'
-import DoctorCard from '../Content/DoctorCard'
-import axios from 'axios'
+import React, { useEffect, useState } from "react";
 
-const response = axios.get("")
+import DoctorCard from "../Content/DoctorCard";
 
-const Patient = () => {
+const Doctor = () => {
+  const [doctorData, setDoctorData] = useState(null);
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    console.log(user.name);
+    if (user) {
+      setDoctorData(user);
+    }
+  }, []);
+
   return (
-    <>
-    <DoctorCard button="Create Appointment"/>
-    </>
-  )
-}
+    <div>
+      {console.log(doctorData)}
+      {doctorData ? (
+        <DoctorCard
+          doctor={doctorData}
+          button={
+            doctorData.role === "Doctor"
+              ? "Get Appointment"
+              : "Create Appointment"
+          }
+        />
+      ) : (
+        <></>
+      )}
+    </div>
+  );
+};
 
-export default Patient
+export default Doctor;

@@ -1,0 +1,39 @@
+.appointment{
+    display: flex;
+    height: 30vh;
+    padding: 20px;
+   
+}
+.appointment-item {
+    
+    background-color: #f1f1f1;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 10px;
+  }
+  
+  .appointment-item p {
+    margin: 5px 0;
+    font-size: 1rem;
+  }
+  
+  .appointment-item strong {
+    font-weight: bold;
+  }
+  
+  h3 {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+  }
+  
+  ul {
+    padding-left: 0;
+    list-style-type: none;
+  }
+  
+  .loading-message {
+    font-size: 1.2rem;
+    color: #999;
+  }
+  
