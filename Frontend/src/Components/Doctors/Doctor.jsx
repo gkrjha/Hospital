@@ -15,14 +15,13 @@ const Doctor = () => {
 
   return (
     <div>
-     
       {doctorData ? (
         <DoctorCard
           doctor={doctorData}
           button={
             doctorData.role === "Doctor"
               ? "Get Appointment"
-              : "Create Appointment"
+              : "Book an Appointment"
           }
         />
       ) : (
@@ -33,4 +32,3 @@ const Doctor = () => {
 };
 
 export default Doctor;
-

@@ -4,8 +4,8 @@ import { getAlldoctors,findOne, createDoctor } from '../Controller/Doctor.contro
 import { verifyToken } from '../Middlewares/TokenVerification.js'
 const doctorRoutes = express.Router()
 
-doctorRoutes.post("/",createDoctor);
-doctorRoutes.get("/",getAlldoctors);
-doctorRoutes.get('/:id',findOne);
+doctorRoutes.post("/",verifyToken,createDoctor);
+doctorRoutes.get("/",verifyToken,getAlldoctors);
+doctorRoutes.get('/:id',verifyToken,findOne);
 
 export default doctorRoutes;

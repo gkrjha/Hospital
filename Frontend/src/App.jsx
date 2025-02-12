@@ -1,128 +1,86 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
-// import "./App.css";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import ProtectedRoute from "./ProtectedRoute"; // Import Protected Route
 import Doctor from "./Components/Doctors/Doctor";
 import Header from "./Components/navbar/Header";
 import Footer from "./Components/navbar/Footer";
 import Services from "./Components/Services/Services";
 import Patient from "./Components/Patient/Patient";
 import Admin from "./Components/Admin/Admin";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Auth from "./Components/Auth/Auth";
 import { RegistrationForm } from "./Components/Auth/Signup";
 import Doctorlist from "./Components/Doctors/Doctorlist";
 import Patientlist from "./Components/Patient/Patientlist";
 import Appointment from "./Components/Appointment/Appointment";
 import AppointList from "./Components/Appointment/AppointList";
+
+const route = createBrowserRouter([
+  {
+    path: "/",
+    element: (
+      <>
+        {" "}
+        <Header /> <Services /> <Footer />{" "}
+      </>
+    ),
+  },
+  {
+    path: "/login",
+    element: (
+      <>
+        {" "}
+        <Header /> <Auth /> <Footer />{" "}
+      </>
+    ),
+  },
+  {
+    path: "/signup",
+    element: (
+      <>
+        {" "}
+        <RegistrationForm /> <Footer />{" "}
+      </>
+    ),
+  },
+
+  {
+    path: "/patient",
+    element: <ProtectedRoute />,
+    children: [{ path: "", element: <Patient /> }],
+  },
+  {
+    path: "/doctor",
+    element: <ProtectedRoute />,
+    children: [{ path: "", element: <Doctor /> }],
+  },
+  {
+    path: "/admin",
+    element: <ProtectedRoute />,
+    children: [{ path: "", element: <Admin /> }],
+  },
+  {
+    path: "/doctor_detail",
+    element: <ProtectedRoute />,
+    children: [{ path: "", element: <Doctorlist /> }],
+  },
+  {
+    path: "/patient_detail",
+    element: <ProtectedRoute />,
+    children: [{ path: "", element: <Patientlist /> }],
+  },
+  {
+    path: "/appointment",
+    element: <ProtectedRoute />,
+    children: [{ path: "", element: <Appointment /> }],
+  },
+  {
+    path: "/appointlist",
+    element: <ProtectedRoute />,
+    children: [{ path: "", element: <AppointList /> }],
+  },
+]);
+
 function App() {
-  const route = createBrowserRouter([
-    {
-      path: "/",
-      element: (
-        <>
-          <Header />
-          <Services />
-          <Footer />
-        </>
-      ),
-    },
-    {
-      path: "/login",
-      element: (
-        <>
-          <Header />
-          <Auth />
-          <Footer />
-        </>
-      ),
-    },
-    {
-      path: "/patient",
-      element: (
-        <>
-          <Header />
-          <Patient />
-          <Footer />
-        </>
-      ),
-    },
-    {
-      path: "/doctor",
-      element: (
-        <>
-          <Header />
-          <Doctor />
-          <Footer />
-        </>
-      ),
-    },
-    {
-      path: "/admin",
-      element: (
-        <>
-          <Header />
-          <Admin />
-          <Footer />
-        </>
-      ),
-    },
-    {
-      path: "/signup",
-      element: (
-        <>
-          <Header />
-          <RegistrationForm />
-          <Footer />
-        </>
-      ),
-    },
-    {
-      path: "/doctor_detail",
-      element: (
-        <>
-          <Header />
-         <Doctorlist />
-          <Footer />
-        </>
-      )
-    },
-    {
-      path:"/patient_detail",
-      element: (
-        <>
-          <Header />
-         <Patientlist />
-          <Footer />
-        </>
-      )
-    },
-    {
-      path:"/appointment",
-      element: (
-        <>
-          <Header />
-         <Appointment />
-          <Footer />
-        </>
-      ) 
-    },
-    {
-      path:"/appointlist",
-      element: (
-        <>
-          <Header />
-         <AppointList />
-          <Footer />
-        </>
-      ) 
-    }
-  ]);
-  return (
-    <>
-      <RouterProvider router={route} />
-    </>
-  );
+  return <RouterProvider router={route} />;
 }
 
 export default App;

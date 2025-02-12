@@ -1,49 +1,55 @@
 import sequelize from "../config/dbConfig.js";
 import { DataTypes } from "sequelize";
-import Appointment from "./Appointment.model.js";
+import bcrypt from "bcryptjs";
 
-const User = sequelize.define('users', {
+const User = sequelize.define(
+  "users",
+  {
     UniqueId: {
-        type: DataTypes.UUID,
-        primaryKey: true,
-        defaultValue: DataTypes.UUIDV4,
-        allowNull: false
+      type: DataTypes.UUID,
+      primaryKey: true,
+      defaultValue: DataTypes.UUIDV4,
+      allowNull: false,
     },
     name: {
-        type: DataTypes.STRING,
-        allowNull: false,
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        len: [2, 50],
+      },
     },
     email: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        set(value) {
-            this.setDataValue('email', value.toLowerCase());
-        },
-        validate: {
-            isEmail: true 
-        }
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true, // Ensures no duplicate emails
+      set(value) {
+        this.setDataValue("email", value.toLowerCase());
+      },
+      validate: {
+        isEmail: true,
+      },
     },
     password: {
-        type: DataTypes.STRING,
-        allowNull: false,
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     role: {
-        type: DataTypes.ENUM('Admin','Doctor', 'Nurse',"Patient"), 
-        allowNull: false,
+      type: DataTypes.ENUM("Admin", "Doctor", "Patient"),
+      allowNull: false,
+      defaultValue: "Doctor",
     },
     phone: {
-        type: DataTypes.STRING, 
-        allowNull: false,
-        validate: {
-            isNumeric: true,
-            len: [10, 15] 
-        }
-    }
-}, {
-    tableName: 'users',
-    timestamps: false 
-});
-
-
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        isNumeric: true,
+        len: [10, 15],
+      },
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
 
 export default User;

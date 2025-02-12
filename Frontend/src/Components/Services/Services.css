@@ -69,10 +69,12 @@
     font-family: "Open Sans", sans-serif;
 }
 .card h2{
+    font-size: 1.4rem;
     color: rgb(120, 80, 80);
 }
 .card h3{
     color: gray;
+    font-size: 1.2rem;
 }
 .card:hover{
     background-color: rgb(255,143,74);

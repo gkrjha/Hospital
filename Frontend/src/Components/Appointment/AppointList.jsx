@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import "./Style.css";
 const AppointList = () => {
   const [appointments, setAppointments] = useState([]);
+  const token = localStorage.getItem("token"); 
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
@@ -24,6 +25,7 @@ const AppointList = () => {
   }, []);
 
   return (
+    <>
     <div>
       <h3>Appointments List</h3>
       {appointments.length > 0 ? (
@@ -57,6 +59,8 @@ const AppointList = () => {
         <p>No appointments</p>
       )}
     </div>
+    </>
+    
   );
 };
 

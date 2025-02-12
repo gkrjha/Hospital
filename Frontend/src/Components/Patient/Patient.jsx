@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 import DoctorCard from "../Content/DoctorCard";
+import Header from "../navbar/Header";
 
 const Doctor = () => {
   const [doctorData, setDoctorData] = useState(null);
@@ -14,6 +15,8 @@ const Doctor = () => {
   }, []);
 
   return (
+    <>
+    <Header/>
     <div>
       {console.log(doctorData)}
       {doctorData ? (
@@ -22,13 +25,14 @@ const Doctor = () => {
           button={
             doctorData.role === "Doctor"
               ? "Get Appointment"
-              : "Create Appointment"
+              : "Book An Appointment"
           }
         />
       ) : (
         <></>
       )}
     </div>
+    </>
   );
 };
 

@@ -4,6 +4,7 @@ import * as yup from "yup";
 import { useState } from "react";
 import "./Auth.css";
 import { useNavigate } from "react-router-dom";
+import Header from "../navbar/Header";
 
 const initialValues = {
   name: "",
@@ -63,6 +64,7 @@ export const RegistrationForm = () => {
       await axios.post("http://localhost:8080/api/user", values, {
         headers: { Authorization: `Bearer ${token}` },
       });
+      console.log();
       console.log(values);
       navigate("/admin");
     } catch (error) {
@@ -71,6 +73,8 @@ export const RegistrationForm = () => {
   };
 
   return (
+    <>
+    <Header />
     <div className="auth-form-container">
       <h2>Registration Form</h2>
       <Formik
@@ -225,5 +229,6 @@ export const RegistrationForm = () => {
 
       {errorMessage && <p className="form-error-message">{errorMessage}</p>}
     </div>
+    </>
   );
 };

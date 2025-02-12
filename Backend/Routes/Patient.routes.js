@@ -4,8 +4,8 @@ import isAdmin from '../Middlewares/Authentication.js'
 import { findOne, getAllPatients,createPatient} from "../Controller/Patient.controller.js";
 const patientRoute = express.Router();
 
-patientRoute.post('/',createPatient)
-patientRoute.get("/:id", findOne);
-patientRoute.get("/",getAllPatients);
+patientRoute.post('/',verifyToken,createPatient)
+patientRoute.get("/:id",verifyToken, findOne);
+patientRoute.get("/",verifyToken,getAllPatients);
 
 export default patientRoute;

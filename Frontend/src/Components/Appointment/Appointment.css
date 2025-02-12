@@ -1,95 +1,169 @@
-
-.cont {
-    height: 70vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+.main-box{
+  display: flex;
+  flex-direction: column;
+  height:fit-content;
+  width: 95%;
+  margin: 44px;
+  padding: 15px;
+  border-radius: 30px;
+  box-shadow: 0 5px 5px 10px rgb(224, 214, 214);
 }
- 
-  .appoint-form {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    background: rgba(255, 255, 255, 0.9); 
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-    width: 400px;
-    max-width: 100%;
-  }
-  
 
-  .form-groups {
-    margin-bottom: 20px;
-  }
-  
+.app-label{
+  height: 20px;
+  width: 120px;
+}
+.app-label h3{
+  font-size: 1.2rem;
+  font-family:Poppins, sans-serif;
+  font-weight: 600;
+}
 
-  label {
-    font-size: 16px;
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 5px;
-    display: block;
-  }
-  
+.app-sd{
+  padding-left: 22px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  display: flex;
+  margin: 0 auto;
+  margin-top: 30px;
+  height:fit-content;
+  max-height: 1200px;
+  width: 95%;
+  border-radius: 30px;
+  box-shadow: 0 5px 5px 5px rgb(228, 218, 218);
+  justify-content: space-around;
+  flex-wrap: wrap;
+}
 
-  .form-input {
-    width: 100%;
-    padding: 10px;
-    margin-top: 5px;
-    border: 2px solid #ccc;
-    border-radius: 5px;
-    font-size: 14px;
-    transition: border-color 0.3s;
-  }
+.boxes{
+  cursor: pointer;
+  margin-top: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: fit-content;
+  width: 15%;
+  padding: 10px;
+  margin: 20px;
+  border-radius: 10px;
+  background-color: rgb(220, 216, 223);
   
+}
 
-  
+.boxes:hover {
+  background-color: rgb(234, 157, 85);
+  color: white;
+  width: 17%;
+  height: 6vh;
+  transition: 0.9s
+}
 
-  .form-error {
-    color: #ff6347; 
-    font-size: 12px;
-    margin-top: 5px;
-  }
 
-  .appoint-button {
-    background-color: #4caf50; 
-    color: #fff;
-    padding: 12px 20px;
-    font-size: 16px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    width: 100%;
-    transition: background-color 0.3s;
-  }
-  
+.boxes h4{
+  font-family: Picsart-Fonts, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", Helvetica, Arabic, sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+.doctor-details-box-con{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 35vh;
+  margin: 30px;
+}
 
-  .appoint-button:hover {
-    background-color: #45a049;
-  }
+.doctor-details-box{
 
-  .auth-form-input {
-    margin-bottom: 10px;
-  }
-  
+  display: flex;
+  height: 35vh;
+  width: 35%;
+  background-color: rgb(250, 239, 239);
+  margin: 30px;
+  border-radius: 20px;
+  flex-direction: column;
+}
+.doctor-hospital{
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-around;
+}
+.hospital-detail{
+  display: flex;
+  flex-direction: column;
+}
+.doctor-drtails{
+  margin-top: 30px;
+  margin-left: 70px;
+}
+.Appointment-info {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
+}
 
-  
+.details {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
 
-  .form-error {
-    color: #ff6347;
-    font-size: 12px;
-    margin-top: 5px;
-  }
+.details div {
+  flex: 1;
+  padding: 15px;
+  border-radius: 8px;
+  background: #f9f9f9;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
 
-  .form-input:focus {
-    outline: none;
-    border-color: #4caf50; 
-  }
-  
-  button:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-  }
-  
-  
+h2 {
+  font-size: 18px;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+p {
+  font-size: 14px;
+  margin: 5px 0;
+  color: #555;
+}
+
+.input-Detail {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+}
+
+.date input {
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  outline: none;
+  transition: 0.3s;
+  font-size: 14px;
+}
+
+.date input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+}
+
+button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  background: #007bff;
+  color: white;
+  cursor: pointer;
+  font-size: 16px;
+  transition: 0.3s;
+}
+
+button:hover {
+  background: #0056b3;
+}

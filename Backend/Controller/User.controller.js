@@ -10,6 +10,7 @@ import Appointment from "../Model/Appointment.model.js";
 import Doctor_detail from "../Model/Doctor.model.js";
 import { createDoctor } from "./Doctor.controller.js";
 import { createPatient } from "./Patient.controller.js";
+import { blacklistedTokens } from "../Helpers/BlacklistToken.js";
 dotenv.config();
 
 const { OAuth2 } = google.auth;
@@ -180,7 +181,6 @@ const signup = async (req, res) => {
     await SendPassword(email, name, randomPassword);
 
     let user_id = user.UniqueId
-    console.log(user_id);
     if(user.role=="Patient"){
       createPatient( user_id, age, gender)
     }
@@ -191,6 +191,21 @@ const signup = async (req, res) => {
     res.status(200).json({ message: "Signup successful", user });
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+};
+
+
+export const logout = async (req, res) => {
+  try {
+    const token = req.header("Authorization")?.replace("Bearer ", "");
+    if (!token) {
+      return res.status(400).json({ message: "No token provided" });
+    }
+
+    blacklistedTokens.add(token);
+    return res.status(200).json({ message: "Logout successful" });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
   }
 };
 

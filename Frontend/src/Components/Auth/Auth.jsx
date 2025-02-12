@@ -4,6 +4,7 @@ import { Formik, Field, ErrorMessage } from "formik";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./Auth.css";
+import Header from "../navbar/Header";
 
 const loginInitialValues = {
   email: "",
@@ -51,6 +52,9 @@ const Auth = () => {
   };
 
   return (
+    <>
+      
+    
     <div className="auth-form-container">
       <h2>Login</h2>
       {errorMessage && <div className="form-error">{errorMessage}</div>}
@@ -99,6 +103,7 @@ const Auth = () => {
         )}
       </Formik>
     </div>
+    </>
   );
 };
 
