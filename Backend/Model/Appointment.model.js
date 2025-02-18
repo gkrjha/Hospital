@@ -1,7 +1,9 @@
 import sequelize from "../config/dbConfig.js";
 import { DataTypes } from "sequelize";
-import Patient_Details from "./Patient.model.js";
 import Doctor_detail from "./Doctor.model.js";
+import moment from "moment";
+import User from "./User.model.js";
+let time = moment("12:15PM", "hh:mmA").format("HH:mm");
 
 const Appointment = sequelize.define(
   "appointment",
@@ -12,12 +14,12 @@ const Appointment = sequelize.define(
       defaultValue: DataTypes.UUIDV4,
       allowNull: false,
     },
-    PatientId: {
+    user_ID: {
       type: DataTypes.UUID,
       allowNull: false,
       references: {
-        model: Patient_Details,
-        key: "PatientID",
+        model: User,
+        key: "UniqueId",
       },
     },
     DoctorId: {

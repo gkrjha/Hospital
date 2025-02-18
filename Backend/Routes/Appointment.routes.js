@@ -9,5 +9,5 @@ export const appointmentrouter = express.Router();
 
 appointmentrouter.get('/:id',verifyToken,getAppointment)
 appointmentrouter.get('/',verifyToken,getallAppointment)
-appointmentrouter.post('/',verifyToken,addAppointment);
+appointmentrouter.post('/',addAppointment);
 appointmentrouter.put("/update-status/:id",verifyToken, updateAppointmentStatus);

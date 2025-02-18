@@ -25,7 +25,7 @@ const DoctorCard = ({ doctor, button }) => {
           </div>
         </div>
       </div>
-
+      
       <div className="appointment-details">
         <h1>APPOINTMENT</h1>
         {

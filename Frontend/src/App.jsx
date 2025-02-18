@@ -34,12 +34,8 @@ const route = createBrowserRouter([
   },
   {
     path: "/signup",
-    element: (
-      <>
-        {" "}
-        <RegistrationForm /> <Footer />{" "}
-      </>
-    ),
+    element:  <ProtectedRoute />,
+    children:[{path:"",element:<RegistrationForm />}]
   },
 
   {
@@ -50,7 +46,7 @@ const route = createBrowserRouter([
   {
     path: "/doctor",
     element: <ProtectedRoute />,
-    children: [{ path: "", element: <Doctor /> }],
+    children: [{ path: "", element: (<><Header/><Doctor /> <Footer/></>) }],
   },
   {
     path: "/admin",

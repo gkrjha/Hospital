@@ -7,10 +7,10 @@ const userRoutes = express.Router();
 
 userRoutes.post('/',verifyToken,isAdmin,signup);
 userRoutes.post('/login', login);
-userRoutes.post("/logout",verifyToken,logout)
+userRoutes.post("/logout",logout)
 userRoutes.get("/count",verifyToken,CountDoctor)
 userRoutes.get("/doctor",verifyToken,isAdmin,getDoctor)
-userRoutes.get("/patient",verifyToken,getPatient)
+userRoutes.get("/patient",getPatient)
 userRoutes.get("/count/patient",verifyToken,CountPatient)
 userRoutes.delete("/:id",verifyToken,deleteUser)
 

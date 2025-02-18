@@ -1,169 +1,110 @@
-.main-box{
-  display: flex;
-  flex-direction: column;
-  height:fit-content;
-  width: 95%;
-  margin: 44px;
-  padding: 15px;
-  border-radius: 30px;
-  box-shadow: 0 5px 5px 10px rgb(224, 214, 214);
+/* General Styles */
+.appointment-container {
+  padding: 2rem;
+  background-color: #f9f9f9;
 }
 
-.app-label{
-  height: 20px;
-  width: 120px;
+.app-section {
+  margin-bottom: 2rem;
 }
-.app-label h3{
-  font-size: 1.2rem;
-  font-family:Poppins, sans-serif;
+
+.app-title {
+  font-size: 1.5rem;
   font-weight: 600;
 }
 
-.app-sd{
-  padding-left: 22px;
-  overflow-y: auto;
-  scrollbar-width: thin;
+.app-boxes {
   display: flex;
-  margin: 0 auto;
-  margin-top: 30px;
-  height:fit-content;
-  max-height: 1200px;
-  width: 95%;
-  border-radius: 30px;
-  box-shadow: 0 5px 5px 5px rgb(228, 218, 218);
-  justify-content: space-around;
   flex-wrap: wrap;
+  gap: 1rem;
 }
 
-.boxes{
+.specialization-box, .doctor-box {
+  background-color: #ffffff;
+  padding: 1rem;
+  border-radius: 5px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   cursor: pointer;
-  margin-top: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: fit-content;
-  width: 15%;
-  padding: 10px;
-  margin: 20px;
-  border-radius: 10px;
-  background-color: rgb(220, 216, 223);
-  
+  transition: transform 0.2s ease;
 }
 
-.boxes:hover {
-  background-color: rgb(234, 157, 85);
-  color: white;
-  width: 17%;
-  height: 6vh;
-  transition: 0.9s
+.specialization-box:hover, .doctor-box:hover {
+  transform: scale(1.05);
 }
 
+.doctor-details-container {
+  margin-top: 2rem;
+  background-color: #ffffff;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
 
-.boxes h4{
-  font-family: Picsart-Fonts, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", Helvetica, Arabic, sans-serif;
-  font-size: 1.1rem;
+.doctor-hospital h3 {
+  font-size: 1.25rem;
   font-weight: 600;
 }
-.doctor-details-box-con{
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 35vh;
-  margin: 30px;
-}
 
-.doctor-details-box{
-
-  display: flex;
-  height: 35vh;
-  width: 35%;
-  background-color: rgb(250, 239, 239);
-  margin: 30px;
-  border-radius: 20px;
-  flex-direction: column;
-}
-.doctor-hospital{
-  margin-top: 20px;
-  display: flex;
-  justify-content: space-around;
-}
-.hospital-detail{
-  display: flex;
-  flex-direction: column;
-}
-.doctor-drtails{
-  margin-top: 30px;
-  margin-left: 70px;
-}
-.Appointment-info {
-  max-width: 600px;
-  margin: 40px auto;
-  padding: 20px;
-  background: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  font-family: Arial, sans-serif;
-}
-
-.details {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-}
-
-.details div {
-  flex: 1;
-  padding: 15px;
-  border-radius: 8px;
-  background: #f9f9f9;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-h2 {
-  font-size: 18px;
+.doctor-info div {
   margin-bottom: 10px;
-  color: #333;
 }
 
-p {
-  font-size: 14px;
-  margin: 5px 0;
-  color: #555;
+.doctor-info label {
+  font-weight: bold;
 }
 
-.input-Detail {
-  margin-top: 20px;
+.appointment-info {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 15px;
+  gap: 2rem;
+  margin-top: 2rem;
 }
 
-.date input {
-  padding: 10px;
-  border-radius: 6px;
+.patient-doctor-info {
+  flex: 1;
+}
+
+.patient-doctor-info h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.appointment-input {
+  flex: 1;
+}
+
+.input-field {
+  margin-bottom: 1rem;
+}
+
+.input-field label {
+  font-weight: bold;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.input-field input {
+  width: 100%;
+  padding: 0.8rem;
   border: 1px solid #ddd;
-  outline: none;
-  transition: 0.3s;
-  font-size: 14px;
+  border-radius: 5px;
 }
 
-.date input:focus {
-  border-color: #007bff;
-  box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+.submit-btn {
+  text-align: center;
 }
 
-button {
-  padding: 10px 20px;
+.submit-btn button {
+  padding: 1rem 2rem;
+  background-color: #4CAF50;
+  color: #fff;
   border: none;
-  border-radius: 6px;
-  background: #007bff;
-  color: white;
+  border-radius: 5px;
   cursor: pointer;
-  font-size: 16px;
-  transition: 0.3s;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
 }
 
-button:hover {
-  background: #0056b3;
+.submit-btn button:hover {
+  background-color: #45a049;
 }

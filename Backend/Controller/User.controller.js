@@ -11,6 +11,7 @@ import Doctor_detail from "../Model/Doctor.model.js";
 import { createDoctor } from "./Doctor.controller.js";
 import { createPatient } from "./Patient.controller.js";
 import { blacklistedTokens } from "../Helpers/BlacklistToken.js";
+import { model } from "mongoose";
 dotenv.config();
 
 const { OAuth2 } = google.auth;
@@ -24,7 +25,7 @@ const auth = new OAuth2(CLIENT_ID, CLIENT_SECRET, ACCESS_TOKEN);
 auth.setCredentials({ refresh_token: REFRESH_TOKEN });
 
 
-const SendPassword = async (email, name, password) => {
+ const SendPassword = async (email, name, message) => {
   try {
     const accessToken = await auth.getAccessToken();
 
@@ -45,7 +46,7 @@ const SendPassword = async (email, name, password) => {
       from: EMAIL_USER,
       to: email,
       subject: "Your Doctor Account Password",
-      text: `Hello ${name},\n\nYour account has been created successfully. Here is your password:\n\n${password}\n\nPlease change it after logging in.`,
+      text: `${message}`,
     };
 
     await transporter.sendMail(mailOptions);
@@ -119,12 +120,24 @@ export const getDoctor = async (req, res) => {
 
 export const getPatient = async (req, res) => {
   try {
-    const patients = await User.findAll({ where: { role: "Patient" } });
+    const patients = await User.findAll({
+      where: { role: "Patient" },
+      include: [
+        {
+          model: Patient_Details, 
+          as: "patient_detail",   
+          attributes: { exclude: [] },
+        }
+      ]
+    });
+    
     res.status(200).json(patients);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
+
+
 
 export const deleteUser = async (req, res) => {
   try {
@@ -164,7 +177,7 @@ const signup = async (req, res) => {
       return res.status(400).json({ message: "Email already exists" });
     }
 
-    const randomPassword = nanoid(6);
+    const randomPassword = "12345";
     const hashedPassword = bcrypt.hashSync(randomPassword, 12);
 
     const user = await User.create({
@@ -178,7 +191,8 @@ const signup = async (req, res) => {
     if (!user) {
       throw new Error("Error creating user");
     }
-    await SendPassword(email, name, randomPassword);
+    const message = `Hello ${name} your password is ${randomPassword}`
+    await SendPassword(email, name, );
 
     let user_id = user.UniqueId
     if(user.role=="Patient"){
@@ -211,4 +225,4 @@ export const logout = async (req, res) => {
 
 
 
-export { signup, login };
+export { signup, login,SendPassword };

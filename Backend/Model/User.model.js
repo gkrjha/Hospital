@@ -21,7 +21,7 @@ const User = sequelize.define(
     email: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true, // Ensures no duplicate emails
+      unique: true,
       set(value) {
         this.setDataValue("email", value.toLowerCase());
       },

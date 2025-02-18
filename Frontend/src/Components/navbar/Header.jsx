@@ -5,18 +5,29 @@ import axios from "axios";
 
 const Header = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
+  const [username, setUsername] = useState(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const handleStorageChange = () => {
       setIsLoggedIn(!!localStorage.getItem("token"));
+      if (localStorage.getItem("user")) {
+        const user = JSON.parse(localStorage.getItem("user"));
+        setUsername(user?.name);
+      }
     };
 
+    if (isLoggedIn && localStorage.getItem("user")) {
+      const user = JSON.parse(localStorage.getItem("user"));
+      setUsername(user?.name);
+    }
+    console.log(username);
     window.addEventListener("storage", handleStorageChange);
     return () => {
       window.removeEventListener("storage", handleStorageChange);
     };
-  }, []);
+  }, [isLoggedIn]);
 
   const handleLogout = async () => {
     try {
@@ -29,13 +40,16 @@ const Header = () => {
       );
       localStorage.removeItem("token");
       localStorage.removeItem("user");
-      window.location.replace("/");
-      setTimeout(() => {
-        window.history.pushState(null, "", "/");
-      }, 0);
+      setIsLoggedIn(false);
+      setUsername(null);
+      navigate("/");
     } catch (error) {
       console.error("Logout Error:", error.response?.data || error.message);
     }
+  };
+
+  const toggleDropdown = () => {
+    setDropdownOpen((prev) => !prev);
   };
 
   return (
@@ -69,7 +83,17 @@ const Header = () => {
       </div>
       <div className="nav-button">
         {isLoggedIn ? (
-          <button onClick={handleLogout}>Logout</button>
+          <div className="dropdown">
+            <button onClick={toggleDropdown} style={{fontWeight:600, padding:"20px", borderRadius:"50%"}}>
+              {username ? username.charAt(0) : "User"
+}
+            </button>
+            {dropdownOpen && (
+              <div className="dropdown-menu">
+                <button onClick={handleLogout} style={{}}>Logout</button>
+              </div>
+            )}
+          </div>
         ) : (
           <Link to="/login">
             <button>Login</button>
