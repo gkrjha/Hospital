@@ -89,6 +89,18 @@
   border: 1px solid #ddd;
   border-radius: 5px;
 }
+.input-field textarea{
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+.input-field select{
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
 
 .submit-btn {
   text-align: center;

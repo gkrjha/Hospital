@@ -16,7 +16,7 @@ const app = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: "*",
+    origin: "http://localhost:5173",
     methods: ["POST", "GET", "PUT", "DELETE"],
     credentials: true,
   })
@@ -26,7 +26,6 @@ app.use("/api/user", userRoutes);
 app.use("/api/doctor", doctorRoutes);
 app.use("/api/patient", patientRoute);
 app.use("/api/appoint", appointmentrouter);
-app.use()
 
 app.use(ErrorHandler);
 

@@ -1,0 +1,774 @@
+import Stripe from "stripe";
+const stripe = new Stripe(
+  "sk_test_51QtMxqFsGQXLFypacSjflqds7JoUvx4xrdRzNDQsMLhKVEFSwd0s2a8MNhyObjkUkhSDxkeDuNX6yqDaniDRVFTY00P7zUBxnV"
+);
+
+export const createPaymentIntent = async (req, res) => {
+  try {
+    const { amount } = req.body;
+
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: amount,
+      currency: "inr",
+      confirmation_method: "manual",
+      confirm: true,
+    });
+
+    res.json({
+      clientSecret: paymentIntent.client_secret,
+    });
+  } catch (error) {
+    console.error("Error creating payment intent:", error);
+    res.status(500).json({ error: "Failed to create payment intent" });
+  }
+};
+
+export const addAppointment = async (req, res) => {
+  const { user_ID, DoctorId, date, time, AppointmentType } = req.body;
+
+  if (!user_ID || !DoctorId || !date || !time || !AppointmentType) {
+    return res
+      .status(400)
+      .json({ error: "Missing required fields in request body" });
+  }
+
+  try {
+    const timeFormatted = moment(time, "HH:mm").format("HH:mm");
+
+    const patient = await Patient_Details.findOne({
+      where: { user_ID },
+      include: {
+        model: User,
+        attributes: ["name", "email", "Phone"],
+        required: true,
+      },
+    });
+
+    if (!patient || !patient.user) {
+      return res
+        .status(404)
+        .json({ error: "Patient or Patient's User data not found" });
+    }
+
+    const doctor = await Doctor_detail.findOne({
+      where: { DoctorID: DoctorId },
+      include: {
+        model: User,
+        attributes: ["name", "email", "phone"],
+        required: true,
+      },
+    });
+
+    if (!doctor) {
+      return res.status(404).json({ error: "Doctor not found" });
+    }
+
+    const appointmentDate = new Date(date);
+    if (isNaN(appointmentDate)) {
+      return res.status(400).json({ error: "Invalid date format" });
+    }
+
+    if (appointmentDate < new Date()) {
+      return res
+        .status(400)
+        .json({ error: "Appointment date cannot be in the past" });
+    }
+
+    const existingAppointment = await Appointment.findOne({
+      where: { user_ID, DoctorId, date },
+    });
+
+    if (existingAppointment) {
+      return res
+        .status(400)
+        .json({ error: "You already have an appointment on this date" });
+    }
+
+    const doctorAppointmentsCount = await Appointment.count({
+      where: { DoctorId, date },
+    });
+
+    if (doctorAppointmentsCount >= 3) {
+      return res.status(400).json({
+        error:
+          "Doctor already has 3 appointments on this date. Please choose another date.",
+      });
+    }
+
+    let appointmentAmount;
+    switch (AppointmentType) {
+      case "New Consultation":
+        appointmentAmount = 600 * 100;
+        break;
+      case "Follow-Up":
+        appointmentAmount = 400 * 100;
+        break;
+      case "Emergency":
+        appointmentAmount = 900 * 100;
+        break;
+      default:
+        return res.status(400).json({ error: "Invalid appointment type" });
+    }
+
+    const newAppointment = await Appointment.create({
+      user_ID,
+      DoctorId,
+      date,
+      time: timeFormatted,
+      AppointmentType,
+    });
+
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: appointmentAmount,
+      currency: "inr",
+    });
+
+    res.status(201).json({
+      message:
+        "Appointment created successfully, please complete your payment.",
+      appointment: newAppointment,
+      clientSecret: paymentIntent.client_secret,
+    });
+  } catch (error) {
+    console.error("Error adding appointment:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const updateAppointmentStatus = async (req, res, next) => {
+  console.log("Received request:", req.method, req.originalUrl);
+
+  let { status } = req.body;
+  const { id } = req.params;
+
+  if (!status) {
+    return res.status(400).json({ error: "Status is required" });
+  }
+
+  try {
+    const appointment = await Appointment.findOne({
+      where: { AppointmentId: id },
+      include: {
+        model: User,
+        attributes: ["name", "email", "Phone"],
+        required: true,
+      },
+    });
+
+    if (!appointment) {
+      return res.status(404).json({ error: "Appointment not found" });
+    }
+    const email = appointment.user.email;
+    const name = appointment.user.name;
+    const message = `Hello ${name}, your appointment has been updated. Your appointment Status is ${status}`;
+    const subject = "Appointment status Update";
+    SendPassword(email, name, message, subject);
+    appointment.status = status;
+    await appointment.save();
+
+    res.status(200).json({
+      message: "Appointment status successfully updated",
+      appointment,
+      patient: appointment.Patient,
+      doctor: appointment.Doctor,
+    });
+  } catch (error) {
+    console.error("Error updating appointment status:", error);
+    next(error);
+  }
+};
+
+
+
+
+
+
+
+frontend
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import Header from "../navbar/Header";
+import { loadStripe } from "@stripe/stripe-js";
+
+import {
+  Elements,
+  CardElement,
+  useStripe,
+  useElements,
+} from "@stripe/react-stripe-js";
+import "./Appointment.css";
+import AppointmentCard from "./AppointmentCard";
+
+const Appointment = () => {
+  const [specialization, setSpecialization] = useState("");
+  const [doctors, setDoctors] = useState([]);
+  const [selectedDoctor, setSelectedDoctor] = useState(null);
+  const [appointmentDate, setAppointmentDate] = useState("");
+  const [appointmentTime, setAppointmentTime] = useState("");
+  const [appointmentType, setAppointmentType] = useState("");
+  const [user, setUser] = useState(null);
+  const [isAppointmentDetails, setIsAppointmentDetails] = useState(false);
+  const [clientSecret, setClientSecret] = useState("");
+  const [appointmentId, setAppointmentId] = useState(null);
+
+  const token = localStorage.getItem("token");
+  const users = JSON.parse(localStorage.getItem("user"));
+
+  useEffect(() => {
+    if (users) {
+      setUser(users);
+    }
+  }, []);
+  const navigation = useNavigate();
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      try {
+        const response = await axios.get("http://localhost:8080/api/doctor", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setDoctors(response.data);
+      } catch (error) {
+        console.error("Error fetching doctors:", error);
+      }
+    };
+
+    fetchDoctors();
+  }, [token]);
+
+  const handleAppointmentSubmission = async () => {
+    if (
+      !appointmentDate ||
+      !appointmentTime ||
+      !selectedDoctor ||
+      !appointmentType
+    ) {
+      alert("Please fill all the details.");
+      return;
+    }
+
+    const value = {
+      user_ID: user?.UniqueId,
+      DoctorId: selectedDoctor?.DoctorID,
+      date: appointmentDate,
+      time: appointmentTime,
+      AppointmentType: appointmentType,
+    };
+
+    try {
+      const response = await axios.post(
+        "http://localhost:8080/api/appoint",
+        value,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      console.log(
+        "Appointment created:",
+        response?.data?.appointment?.AppointmentId
+      );
+      console.log(response);
+      console.log(response?.data?.clientSecret);
+      setAppointmentId(response?.data?.appointment?.AppointmentId);
+      setClientSecret(response?.data?.clientSecret);
+      setIsAppointmentDetails(false);
+      navigation("/payment", {
+        state: { appointmentId: response?.data?.appointment?.AppointmentId ,clientSecret:response?.data?.clientSecret},
+      });
+    } catch (error) {
+      console.error("Error booking appointment:", error);
+      alert("Error booking appointment.");
+    }
+  };
+
+  const handlePaymentSubmission = async (event) => {
+    event.preventDefault();
+    const stripe = useStripe();
+    const elements = useElements();
+  
+    if (!stripe || !elements) {
+      return;
+    }
+  
+    const cardElement = elements.getElement(CardElement);
+  
+    const { error, paymentIntent } = await stripe.confirmCardPayment(
+      clientSecret,
+      {
+        payment_method: {
+          card: cardElement,
+        },
+      }
+    );
+  
+    if (error) {
+      console.error("Payment failed", error);
+      alert("Payment failed: " + error.message);
+    } else if (paymentIntent.status === "succeeded") {
+      alert("Payment successful! Your appointment has been booked.");
+  
+     
+      try {
+        const appointmentResponse = await axios.put(
+          `http://localhost:8080/api/appoint/${appointmentId}`,
+          { status: "paid" }, 
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        navigation("/appointments"); 
+      } catch (error) {
+        console.error("Error updating appointment status:", error);
+      }
+    } else {
+      console.error("Payment not completed or status is not 'succeeded'");
+      alert("Payment was not successful. Please try again.");
+    }
+  };
+  
+
+  return (
+    <>
+      <Header />
+      <div className="appointment-container">
+        <div className="app-section">
+          <h3 className="app-title">Specialization</h3>
+          <div className="app-boxes">
+            {Array.from(
+              new Set(doctors.map((item) => item.specialization))
+            ).map((specialization, index) => (
+              <div
+                key={index}
+                className="specialization-box"
+                onClick={() => setSpecialization(specialization)}
+              >
+                <h4>{specialization}</h4>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {specialization && (
+          <div className="app-section">
+            <h3 className="app-title">Doctors</h3>
+            <div className="app-boxes">
+              {doctors
+                .filter((doc) => doc.specialization === specialization)
+                .map((doc, index) => (
+                  <div
+                    key={index}
+                    className="doctor-box"
+                    onClick={() => setSelectedDoctor(doc)}
+                  >
+                    <h4>{doc.user.name}</h4>
+                  </div>
+                ))}
+            </div>
+          </div>
+        )}
+
+        {selectedDoctor && (
+          <div className="doctor-details-container">
+            <div className="doctor-details">
+              <div className="doctor-hospital">
+                <h3>
+                  Apollo Hospitals{" "}
+                  <span
+                    style={{
+                      color: "green",
+                      fontSize: "2rem",
+                      fontWeight: 700,
+                    }}
+                  >
+                    +
+                  </span>
+                  <p>Chandigarh, Punjab 1600103</p>
+                </h3>
+              </div>
+
+              <div className="doctor-info">
+                <div>
+                  <label>Name:</label>
+                  <span>{selectedDoctor.user.name}</span>
+                </div>
+                <div>
+                  <label>Email:</label>
+                  <span>{selectedDoctor.user.email}</span>
+                </div>
+                <div>
+                  <label>Phone:</label>
+                  <span>{selectedDoctor.user.phone}</span>
+                </div>
+                <div>
+                  <label>Specialization:</label>
+                  <span>{selectedDoctor.specialization}</span>
+                </div>
+
+                <div className="submit-btn">
+                  <button onClick={() => setIsAppointmentDetails(true)}>
+                    Book Appointment
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {isAppointmentDetails && (
+          <div className="appointment-info">
+            <div className="patient-doctor-info">
+              <div>
+                <h2>Patient</h2>
+                <p>{user?.name}</p>
+                <p>{user?.email}</p>
+                <p>{user?.phone}</p>
+              </div>
+
+              <div>
+                <h2>Doctor</h2>
+                <p>{selectedDoctor?.user?.name}</p>
+                <p>{selectedDoctor?.user?.email}</p>
+                <p>{selectedDoctor?.user?.phone}</p>
+                <p>{selectedDoctor?.specialization}</p>
+              </div>
+            </div>
+
+            <div className="appointment-input">
+              <div className="input-field">
+                <label htmlFor="appointmentDate">Appointment Date:</label>
+                <input
+                  type="date"
+                  id="appointmentDate"
+                  value={appointmentDate}
+                  onChange={(e) => setAppointmentDate(e.target.value)}
+                />
+              </div>
+
+              <div className="input-field">
+                <label htmlFor="appointmentTime">Appointment Time:</label>
+                <input
+                  type="time"
+                  id="appointmentTime"
+                  value={appointmentTime}
+                  onChange={(e) => setAppointmentTime(e.target.value)}
+                />
+              </div>
+
+              <div className="input-field">
+                <label htmlFor="appointmentType">Appointment Type:</label>
+                <select
+                  id="appointmentType"
+                  value={appointmentType}
+                  onChange={(e) => setAppointmentType(e.target.value)}
+                >
+                  <option>Select Appointment Type</option>
+                  <option value="New Consultation">New Consultation</option>
+                  <option value="Follow-Up">Follow-Up</option>
+                  <option value="Emergency">Emergency</option>
+                </select>
+              </div>
+
+              <div className="submit-btn">
+                <button onClick={handleAppointmentSubmission}>
+                  Submit Appointment Details
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* {clientSecret && (
+          <div className="payment-form">
+            <h3>Complete Your Payment</h3>
+            <form onSubmit={handlePaymentSubmission}>
+              <CardElement />
+              <button type="submit" disabled={!clientSecret}>
+                Pay Now
+              </button>
+            </form>
+          </div>
+        )} */}
+      </div>
+    </>
+  );
+};
+
+export default Appointment;
+
+
+
+import { Elements, PaymentElement } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
+import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
+
+const AppointmentCard = ({ ...props }) => {
+  const [clientSecret, setClientSecret] = useState(null);
+  const location = useLocation();
+  const appointmentId = location.state?.appointmentId;
+  const stripePromise = loadStripe(
+    "pk_test_51QtMxqFsGQXLFypabMPPs1Odpvfq2VXL5mivQNISsXzE8sdVdZdegxxvMvtb29KAq9P8PResi4djcRMLzBSZYenv00uUc0uz6y"
+  );
+
+
+  useEffect(() => {
+    const fetchClientSecret = async () => {
+      try {
+        
+        const response = await fetch('/api/create-payment-intent', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ appointmentId }),
+        });
+        const data = await response.json();
+        setClientSecret(data.clientSecret); 
+      } catch (error) {
+        console.error("Error fetching client secret:", error);
+      }
+    };
+    fetchClientSecret();
+  }, [appointmentId]);
+
+ 
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    if (!clientSecret) {
+      console.error("No client secret available");
+      return;
+    }
+
+    const stripe = await stripePromise;
+    const elements = stripe.elements();
+
+    const { error, paymentIntent } = await stripe.confirmPayment({
+      elements,
+      confirmParams: {
+        return_url: window.location.href, 
+      },
+    });
+
+    if (error) {
+      console.error(error.message);
+    } else if (paymentIntent.status === 'succeeded') {
+      console.log("Payment successful!");
+      
+    }
+  };
+
+
+  if (!clientSecret) {
+    return <div>Loading...</div>;
+  }
+
+  const options = {
+    clientSecret,
+  };
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "space-around",
+        alignItems: "center",
+        marginTop: "170px",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignContent: "center",
+          justifyContent: "center",
+          backgroundColor: "white",
+          boxShadow: "0px 2px 2px rgba(255,255,255,0.2)",
+          borderRadius: "20px",
+          padding: "140px",
+        }}
+      >
+        <h2 style={{ fontSize: "1.8rem", color: "orange" }}>Appointment's Charge</h2>
+        <h2 style={{ fontSize: "1rem", textAlign: "center" }}>RS 700</h2>
+      </div>
+
+      <div
+        style={{
+          backgroundColor: "white",
+          padding: "50px",
+          boxShadow: "0px 2px 2px rgba(255,255,255,0.2)",
+          borderRadius: "30px",
+        }}
+      >
+        <h1>Payment Page</h1>
+        <Elements stripe={stripePromise} options={options}>
+          <form onSubmit={handleSubmit}>
+            <PaymentElement />
+            <button
+              type="submit"
+              style={{
+                width: "90%",
+                backgroundColor: "blue",
+                marginTop: "10px",
+                marginLeft: "20px",
+                padding: "10px",
+                color: "white",
+                fontWeight: "600",
+                borderRadius: "10px",
+                cursor: "pointer",
+              }}
+            >
+              Submit
+            </button>
+          </form>
+        </Elements>
+      </div>
+    </div>
+  );
+};
+
+export default AppointmentCard;
+
+
+
+
+
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+import "./Style.css";
+import Header from "../navbar/Header";
+
+const AppointList = () => {
+  const location = useLocation();
+  const [appointments, setAppointments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const token = localStorage.getItem("token");
+
+  const [selectedStatus, setSelectedStatus] = useState("");
+
+  const handleStatusChange = (e, appointmentId) => {
+    setSelectedStatus({ ...selectedStatus, [appointmentId]: e.target.value });
+  };
+
+  const handleUpdateStatus = async (appointmentId) => {
+    const status = selectedStatus[appointmentId];
+    if (!status) return;
+
+    try {
+      const response = await axios.put(
+        `http://localhost:8080/api/appoint/status/${appointmentId}`,
+        { status },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+     
+      const updatedAppointments = appointments.map((appointment) => 
+        appointment.AppointmentId === appointmentId
+          ? { ...appointment, status: response.data.appointment.status }
+          : appointment
+      );
+      setAppointments(updatedAppointments);
+
+      alert("Appointment status updated successfully!");
+    } catch (error) {
+      setError(error.message);
+    }
+  };
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (user) {
+      const doctorId = location?.state?.DoctorID;
+      const getAppointments = async () => {
+        try {
+          const response = await axios.get(
+            `http://localhost:8080/api/appoint/${doctorId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          setAppointments(response.data.data);
+          setLoading(false);
+        } catch (error) {
+          setError(error.message);
+          setLoading(false);
+     
+          console.error('Error updating appointment status:', error);
+         
+       
+       
+        }
+      };
+      getAppointments();
+    }
+  }, [location.state?.DoctorID, token]);
+
+  if (loading) {
+    return <div className="loading">Loading appointments...</div>;
+  }
+
+  if (error) {
+    return <div className="error">Error: {error}</div>;
+  }
+  console.log(appointments);
+  return (
+    <>
+      <Header />
+      <div className="appointments-container">
+        <h3 className="appointments-title">Appointments List</h3>
+        {appointments.length > 0 ? (
+          <ul className="appointments-list">
+            {appointments.map((appointment) => (
+              <li key={appointment.AppointmentId} className="appointment-item">
+                <div className="appointment-details">
+                  <p>
+                    <strong>Patient:</strong> {appointment?.user?.name}
+                  </p>
+                  <p>
+                    <strong>Date:</strong>{" "}
+                    {new Date(appointment.date).toLocaleDateString()}
+                  </p>
+                  <p>
+                    <strong>Time:</strong> {appointment.time}
+                  </p>
+                  <p>
+                    <strong>Status:</strong> {appointment.status}
+                  </p>
+                  <p>
+                    <strong>Appointment Type:</strong>{" "}
+                    {appointment.AppointmentType}
+                  </p>
+
+                
+                  <select
+                    value={selectedStatus[appointment.AppointmentId] || appointment.status}
+                    onChange={(e) => handleStatusChange(e, appointment.AppointmentId)}
+                  >
+                    <option value="Pending">Pending</option>
+                    <option value="Confirm">Confirm</option>
+                    <option value="Cancle">Cancel</option>
+                  </select>
+
+                  <button onClick={() => handleUpdateStatus(appointment.AppointmentId)}>
+                    Update Status
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No appointments available.</p>
+        )}
+      </div>
+    </>
+  );
+};
+
+export default AppointList;
+

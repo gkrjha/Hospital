@@ -1,19 +1,30 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import "./Appointment.css";
 import { useNavigate } from "react-router-dom";
 import Header from "../navbar/Header";
-import { jwtDecode } from "jwt-decode";
+import { loadStripe } from "@stripe/stripe-js";
+
+import {
+  Elements,
+  CardElement,
+  useStripe,
+  useElements,
+} from "@stripe/react-stripe-js";
+import "./Appointment.css";
+import AppointmentCard from "./AppointmentCard";
 
 const Appointment = () => {
   const [specialization, setSpecialization] = useState("");
-  const [doctors, setDoctors] = useState([]); 
+  const [doctors, setDoctors] = useState([]);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [appointmentDate, setAppointmentDate] = useState("");
   const [appointmentTime, setAppointmentTime] = useState("");
+  const [appointmentType, setAppointmentType] = useState("");
   const [user, setUser] = useState(null);
-  const [isAppointmentDetails, setIsAppointmentDetails] = useState(false); 
-  const navigate = useNavigate();
+  const [isAppointmentDetails, setIsAppointmentDetails] = useState(false);
+  const [clientSecret, setClientSecret] = useState("");
+  const [appointmentId, setAppointmentId] = useState(null);
+
   const token = localStorage.getItem("token");
   const users = JSON.parse(localStorage.getItem("user"));
 
@@ -22,19 +33,14 @@ const Appointment = () => {
       setUser(users);
     }
   }, []);
-
+  const navigation = useNavigate();
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:8080/api/doctor",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        setDoctors(response.data); 
+        const response = await axios.get("http://localhost:8080/api/doctor", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setDoctors(response.data);
       } catch (error) {
         console.error("Error fetching doctors:", error);
       }
@@ -44,7 +50,12 @@ const Appointment = () => {
   }, [token]);
 
   const handleAppointmentSubmission = async () => {
-    if (!appointmentDate || !appointmentTime || !selectedDoctor) {
+    if (
+      !appointmentDate ||
+      !appointmentTime ||
+      !selectedDoctor ||
+      !appointmentType
+    ) {
       alert("Please fill all the details.");
       return;
     }
@@ -53,9 +64,10 @@ const Appointment = () => {
       user_ID: user?.UniqueId,
       DoctorId: selectedDoctor?.DoctorID,
       date: appointmentDate,
-      time: appointmentTime, 
+      time: appointmentTime,
+      AppointmentType: appointmentType,
     };
-    
+
     try {
       const response = await axios.post(
         "http://localhost:8080/api/appoint",
@@ -64,14 +76,67 @@ const Appointment = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      console.log("Appointment booked:", response.data);
-      alert("Appointment booked successfully.");
+      console.log(
+        "Appointment created:",
+        response?.data?.appointment?.AppointmentId
+      );
+      console.log(response);
+      console.log(response?.data?.clientSecret);
+      setAppointmentId(response?.data?.appointment?.AppointmentId);
+      setClientSecret(response?.data?.clientSecret);
       setIsAppointmentDetails(false);
+      navigation("/payment", {
+        state: { appointmentId: response?.data?.appointment?.AppointmentId ,clientSecret:response?.data?.clientSecret},
+      });
     } catch (error) {
       console.error("Error booking appointment:", error);
       alert("Error booking appointment.");
     }
   };
+
+  const handlePaymentSubmission = async (event) => {
+    event.preventDefault();
+    const stripe = useStripe();
+    const elements = useElements();
+  
+    if (!stripe || !elements) {
+      return;
+    }
+  
+    const cardElement = elements.getElement(CardElement);
+  
+    const { error, paymentIntent } = await stripe.confirmCardPayment(
+      clientSecret,
+      {
+        payment_method: {
+          card: cardElement,
+        },
+      }
+    );
+  
+    if (error) {
+      console.error("Payment failed", error);
+      alert("Payment failed: " + error.message);
+    } else if (paymentIntent.status === "succeeded") {
+      alert("Payment successful! Your appointment has been booked.");
+  
+     
+      try {
+        const appointmentResponse = await axios.put(
+          `http://localhost:8080/api/appoint/${appointmentId}`,
+          { status: "paid" }, 
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        navigation("/appointments"); 
+      } catch (error) {
+        console.error("Error updating appointment status:", error);
+      }
+    } else {
+      console.error("Payment not completed or status is not 'succeeded'");
+      alert("Payment was not successful. Please try again.");
+    }
+  };
+  
 
   return (
     <>
@@ -80,13 +145,15 @@ const Appointment = () => {
         <div className="app-section">
           <h3 className="app-title">Specialization</h3>
           <div className="app-boxes">
-            {doctors.map((item, index) => (
+            {Array.from(
+              new Set(doctors.map((item) => item.specialization))
+            ).map((specialization, index) => (
               <div
                 key={index}
                 className="specialization-box"
-                onClick={() => setSpecialization(item.specialization)}
+                onClick={() => setSpecialization(specialization)}
               >
-                <h4>{item.specialization}</h4>
+                <h4>{specialization}</h4>
               </div>
             ))}
           </div>
@@ -126,7 +193,7 @@ const Appointment = () => {
                   >
                     +
                   </span>
-                  <p>Chandighar, Punjab 1600103</p>
+                  <p>Chandigarh, Punjab 1600103</p>
                 </h3>
               </div>
 
@@ -163,7 +230,6 @@ const Appointment = () => {
             <div className="patient-doctor-info">
               <div>
                 <h2>Patient</h2>
-                {console.log(user?.UniqueId)}
                 <p>{user?.name}</p>
                 <p>{user?.email}</p>
                 <p>{user?.phone}</p>
@@ -171,9 +237,6 @@ const Appointment = () => {
 
               <div>
                 <h2>Doctor</h2>
-                {
-                console.log(selectedDoctor?.DoctorID)}
-                <p>{selectedDoctor?.user?.DoctorID}</p>
                 <p>{selectedDoctor?.user?.name}</p>
                 <p>{selectedDoctor?.user?.email}</p>
                 <p>{selectedDoctor?.user?.phone}</p>
@@ -201,19 +264,44 @@ const Appointment = () => {
                   onChange={(e) => setAppointmentTime(e.target.value)}
                 />
               </div>
+
+              <div className="input-field">
+                <label htmlFor="appointmentType">Appointment Type:</label>
+                <select
+                  id="appointmentType"
+                  value={appointmentType}
+                  onChange={(e) => setAppointmentType(e.target.value)}
+                >
+                  <option>Select Appointment Type</option>
+                  <option value="New Consultation">New Consultation</option>
+                  <option value="Follow-Up">Follow-Up</option>
+                  <option value="Emergency">Emergency</option>
+                </select>
+              </div>
+
               <div className="submit-btn">
                 <button onClick={handleAppointmentSubmission}>
-                  Submit Detail
+                  Submit Appointment Details
                 </button>
               </div>
             </div>
           </div>
         )}
+
+        {/* {clientSecret && (
+          <div className="payment-form">
+            <h3>Complete Your Payment</h3>
+            <form onSubmit={handlePaymentSubmission}>
+              <CardElement />
+              <button type="submit" disabled={!clientSecret}>
+                Pay Now
+              </button>
+            </form>
+          </div>
+        )} */}
       </div>
     </>
   );
 };
 
 export default Appointment;
-
-

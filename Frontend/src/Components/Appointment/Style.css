@@ -1,39 +1,110 @@
-.appointment{
-    display: flex;
-    height: 30vh;
-    padding: 20px;
-   
+/* Overall container */
+.appointments-container {
+  width: 90%;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 30px;
+  background-color: #f4f4f9;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
+
+/* Title Styling */
+.appointments-title {
+  font-size: 26px;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* List of appointments */
+.appointments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Individual appointment item */
 .appointment-item {
-    
-    background-color: #f1f1f1;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    padding: 15px;
-    margin-bottom: 10px;
-  }
-  
-  .appointment-item p {
-    margin: 5px 0;
-    font-size: 1rem;
-  }
-  
-  .appointment-item strong {
-    font-weight: bold;
-  }
-  
-  h3 {
-    font-size: 1.8rem;
-    margin-bottom: 20px;
-  }
-  
-  ul {
-    padding-left: 0;
-    list-style-type: none;
-  }
-  
-  .loading-message {
-    font-size: 1.2rem;
-    color: #999;
-  }
-  
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  border-left: 5px solid #4CAF50;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.appointment-item:hover {
+  transform: scale(1.02);
+}
+
+/* Details of appointment (name, date, etc.) */
+.appointment-details p {
+  font-size: 16px;
+  margin-bottom: 8px;
+  color: #555;
+}
+
+.appointment-details strong {
+  font-weight: 600;
+  color: #333;
+}
+
+/* Dropdown for updating status */
+select {
+  padding: 10px;
+  font-size: 16px;
+  width: 150px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f8f8f8;
+  color: #666;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+}
+
+select:focus {
+  outline: none;
+  border-color: #4CAF50;
+}
+
+/* Update Status Button */
+button {
+  padding: 10px 18px;
+  background-color: #4CAF50;
+  color: #fff;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+button:active {
+  background-color: #3e8e41;
+}
+
+button:disabled {
+  background-color: #bbb;
+  cursor: not-allowed;
+}
+
+/* Loading and Error Messages */
+.loading,
+.error {
+  font-size: 18px;
+  text-align: center;
+  color: #333;
+  margin-top: 20px;
+}
+
+.error {
+  color: #e74c3c;
+  font-weight: bold;
+}

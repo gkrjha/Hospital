@@ -25,7 +25,7 @@ const auth = new OAuth2(CLIENT_ID, CLIENT_SECRET, ACCESS_TOKEN);
 auth.setCredentials({ refresh_token: REFRESH_TOKEN });
 
 
- const SendPassword = async (email, name, message) => {
+ const SendPassword = async (email, name, message,subject) => {
   try {
     const accessToken = await auth.getAccessToken();
 
@@ -45,7 +45,7 @@ auth.setCredentials({ refresh_token: REFRESH_TOKEN });
     const mailOptions = {
       from: EMAIL_USER,
       to: email,
-      subject: "Your Doctor Account Password",
+      subject: `${subject}`,
       text: `${message}`,
     };
 
@@ -69,7 +69,7 @@ const login = async (req, res) => {
     if (!user) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
-
+    const data =user.UniqueId;
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       return res.status(400).json({ message: "Invalid credentials" });
@@ -81,7 +81,18 @@ const login = async (req, res) => {
       { expiresIn: "7h" }
     );
 
-    res.status(200).json({ message: "Login successful", user, token });
+    let additionalUserData = {};
+    if (user.role === "Doctor") {
+      additionalUserData = await Doctor_detail.findOne({where:{user_ID:data}})
+    }
+
+   
+    if (user.role === "Patient") {
+      additionalUserData = await Patient_Details.findOne({where:{user_ID:data}})
+      
+    }
+
+    res.status(200).json({ message: "Login successful", user,additionalUserData,data,  token });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

@@ -29,7 +29,7 @@ const Auth = () => {
         "http://localhost:8080/api/user/login",
         values
       );
-
+      const data = response.data.additionalUserData.DoctorID;
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("user", JSON.stringify(response.data.user));
 
@@ -39,7 +39,10 @@ const Auth = () => {
       if (userRole === "Admin") {
         navigate("/admin");
       } else if (userRole === "Doctor") {
-        navigate("/doctor");
+        console.log(response.data.additionalUserData.DoctorID);
+        navigate("/doctor",{
+          state:{DoctorID:response.data.additionalUserData.DoctorID}
+        });
       } else if (userRole === "Patient") {
         navigate("/patient");
       }
@@ -53,56 +56,54 @@ const Auth = () => {
 
   return (
     <>
-      
-    
-    <div className="auth-form-container">
-      <h2>Login</h2>
-      {errorMessage && <div className="form-error">{errorMessage}</div>}
+      <div className="auth-form-container">
+        <h2>Login</h2>
+        {errorMessage && <div className="form-error">{errorMessage}</div>}
 
-      <Formik
-        initialValues={loginInitialValues}
-        validationSchema={validationSchema}
-        onSubmit={handleLoginSubmit}
-      >
-        {({ handleSubmit }) => (
-          <div className="form-cont">
-            <form className="auth-form" onSubmit={handleSubmit}>
-              <div className="form-group">
-                <label>Email</label>
-                <div className="auth-form-input">
-                  <Field type="email" name="email" className="form-input" />
-                  <ErrorMessage
-                    name="email"
-                    component="div"
-                    className="form-error"
-                  />
+        <Formik
+          initialValues={loginInitialValues}
+          validationSchema={validationSchema}
+          onSubmit={handleLoginSubmit}
+        >
+          {({ handleSubmit }) => (
+            <div className="form-cont">
+              <form className="auth-form" onSubmit={handleSubmit}>
+                <div className="form-group">
+                  <label>Email</label>
+                  <div className="auth-form-input">
+                    <Field type="email" name="email" className="form-input" />
+                    <ErrorMessage
+                      name="email"
+                      component="div"
+                      className="form-error"
+                    />
+                  </div>
                 </div>
-              </div>
 
-              <div className="form-group">
-                <label>Password</label>
-                <div className="auth-form-input">
-                  <Field
-                    type="password"
-                    name="password"
-                    className="form-input"
-                  />
-                  <ErrorMessage
-                    name="password"
-                    component="div"
-                    className="form-error"
-                  />
+                <div className="form-group">
+                  <label>Password</label>
+                  <div className="auth-form-input">
+                    <Field
+                      type="password"
+                      name="password"
+                      className="form-input"
+                    />
+                    <ErrorMessage
+                      name="password"
+                      component="div"
+                      className="form-error"
+                    />
+                  </div>
                 </div>
-              </div>
 
-              <button type="submit" className="auth-form-button">
-                Login
-              </button>
-            </form>
-          </div>
-        )}
-      </Formik>
-    </div>
+                <button type="submit" className="auth-form-button">
+                  Login
+                </button>
+              </form>
+            </div>
+          )}
+        </Formik>
+      </div>
     </>
   );
 };

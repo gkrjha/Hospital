@@ -1,9 +1,9 @@
 import React from 'react';
 import "./DoctorCard.css"
 import { useNavigate } from 'react-router-dom';
-const DoctorCard = ({ doctor, button }) => {
+const DoctorCard = ({ doctor, button,doctorid  }) => {
   const navigate = useNavigate();
-
+  console.log(doctorid);
   return (
     <div className="doctor">
       <div className="doctor-details">
@@ -29,7 +29,9 @@ const DoctorCard = ({ doctor, button }) => {
       <div className="appointment-details">
         <h1>APPOINTMENT</h1>
         {
-          doctor.role =="Doctor"?(<><button type="button" onClick={() => { navigate("/appointlist") }}>{button}</button></>):(<><button type="button" onClick={() => { navigate("/appointment") }}>{button}</button></>)
+          doctor.role =="Doctor"?(<><button type="button" onClick={() => { navigate("/appointlist",{
+            state:{DoctorID:doctorid}
+          }) }}>{button}</button></>):(<><button type="button" onClick={() => { navigate("/appointment") }}>{button}</button></>)
         }
         
       </div>

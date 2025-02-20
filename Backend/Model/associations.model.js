@@ -17,6 +17,8 @@ Appointment.belongsTo(Patient_Details, { foreignKey: 'PatientId',});
 Doctor_detail.hasMany(Appointment, { foreignKey: 'DoctorId'});
 Appointment.belongsTo(Doctor_detail, { foreignKey: 'DoctorId'});
 
+User.hasMany(Appointment,{foreignKey:'user_ID'})
+Appointment.belongsTo(User,{foreignKey:'user_ID'})
 
 export default async function setupAssociations() {
   await sequelize.sync();  

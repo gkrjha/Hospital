@@ -30,6 +30,13 @@ const Appointment = sequelize.define(
         key: "DoctorID",
       },
     },
+    AppointmentType:{
+      type:DataTypes.ENUM("New Consultation", "Follow-Up", "Emergency"),
+      allowNull:false
+    },
+    VisitResion:{
+      type:DataTypes.STRING,
+    },
     date: {
       type: DataTypes.DATEONLY,
       allowNull: false,
@@ -43,7 +50,7 @@ const Appointment = sequelize.define(
       allowNull: false,
     },
     status: {
-      type: DataTypes.ENUM("Confirm", "Pending", "Done"),
+      type: DataTypes.ENUM("Confirm", "Pending", "Cancle"),
       allowNull: true,
       defaultValue: "Pending",
     },
