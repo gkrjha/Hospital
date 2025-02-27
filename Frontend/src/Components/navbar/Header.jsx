@@ -1,36 +1,33 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import "./Navbar.css";
+import Dropdown from "react-bootstrap/Dropdown";
 import axios from "axios";
+import "./Navbar.css";
 
 const Header = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState(null);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const handleStorageChange = () => {
-      setIsLoggedIn(!!localStorage.getItem("token"));
-      if (localStorage.getItem("user")) {
-        const user = JSON.parse(localStorage.getItem("user"));
-        setUsername(user?.name);
-      }
+    const updateUserState = () => {
+      const token = localStorage.getItem("token");
+      const user = localStorage.getItem("user");
+
+      setIsLoggedIn(!!token);
+      setUsername(user ? JSON.parse(user)?.name || "User" : null);
     };
 
-    if (isLoggedIn && localStorage.getItem("user")) {
-      const user = JSON.parse(localStorage.getItem("user"));
-      setUsername(user?.name);
-    }
-    console.log(username);
-    window.addEventListener("storage", handleStorageChange);
-    return () => {
-      window.removeEventListener("storage", handleStorageChange);
-    };
-  }, [isLoggedIn]);
+    updateUserState();
+    window.addEventListener("storage", updateUserState);
+
+    return () => window.removeEventListener("storage", updateUserState);
+  }, []);
 
   const handleLogout = async () => {
     try {
+      document.body.click(); // Closes dropdown before updating state
+
       await axios.post(
         "http://localhost:8080/api/user/logout",
         {},
@@ -38,6 +35,7 @@ const Header = () => {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         }
       );
+
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       setIsLoggedIn(false);
@@ -48,12 +46,8 @@ const Header = () => {
     }
   };
 
-  const toggleDropdown = () => {
-    setDropdownOpen((prev) => !prev);
-  };
-
   return (
-    <div className="nav-header">
+    <nav className="nav-header">
       <div className="nav-logo">
         <Link to="/">
           <img
@@ -62,45 +56,42 @@ const Header = () => {
           />
         </Link>
       </div>
-      <div className="nav-item">
-        <ul className="nav-list-item">
-          <li>
-            <Link to="/">Home</Link>
-          </li>
-          <li>
-            <Link to="/services">Services</Link>
-          </li>
-          <li>
-            <Link to="/doctor">Doctor</Link>
-          </li>
-          <li>
-            <Link to="/about">About</Link>
-          </li>
-          <li>
-            <Link to="/contact">Contact</Link>
-          </li>
-        </ul>
-      </div>
-      <div className="nav-button">
+
+      <ul className="nav-list">
+        <li>
+          <Link to="/">Home</Link>
+        </li>
+        <li>
+          <Link to="/services">Services</Link>
+        </li>
+        <li>
+          <Link to="/doctor">Doctor</Link>
+        </li>
+        <li>
+          <Link to="/about">About</Link>
+        </li>
+        <li>
+          <Link to="/contact">Contact</Link>
+        </li>
+      </ul>
+
+      <div className="nav-auth">
         {isLoggedIn ? (
-          <div className="dropdown">
-            <button onClick={toggleDropdown} style={{fontWeight:600, padding:"20px", borderRadius:"50%"}}>
-              {username ? username.charAt(0) : "User"
-}
-            </button>
-            {dropdownOpen && (
-              <div className="dropdown-menu">
-                <button onClick={handleLogout} style={{}}>Logout</button>
-              </div>
-            )}
-          </div>
+          <Dropdown>
+            <Dropdown.Toggle className="profile-button">
+              {username || "U"}
+            </Dropdown.Toggle>
+            <Dropdown.Menu>
+              <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
         ) : (
           <Link to="/login">
-            <button>Login</button>
+            <button className="login-button">Login</button>
           </Link>
         )}
       </div>
-    </div>
+    </nav>
   );
 };
 

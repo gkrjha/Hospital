@@ -30,12 +30,12 @@ const Appointment = sequelize.define(
         key: "DoctorID",
       },
     },
-    AppointmentType:{
-      type:DataTypes.ENUM("New Consultation", "Follow-Up", "Emergency"),
-      allowNull:false
+    AppointmentType: {
+      type: DataTypes.ENUM("New Consultation", "Follow-Up", "Emergency"),
+      allowNull: false,
     },
-    VisitResion:{
-      type:DataTypes.STRING,
+    VisitResion: {
+      type: DataTypes.STRING,
     },
     date: {
       type: DataTypes.DATEONLY,
@@ -53,6 +53,10 @@ const Appointment = sequelize.define(
       type: DataTypes.ENUM("Confirm", "Pending", "Cancle"),
       allowNull: true,
       defaultValue: "Pending",
+    },
+    paymentIntentId: {
+      type: DataTypes.STRING,
+      
     },
   },
   { timestamps: true }

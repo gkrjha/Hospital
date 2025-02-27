@@ -24,6 +24,7 @@ const Appointment = () => {
   const [isAppointmentDetails, setIsAppointmentDetails] = useState(false);
   const [clientSecret, setClientSecret] = useState("");
   const [appointmentId, setAppointmentId] = useState(null);
+  const [doctorAppointmentsCount, setDoctorAppointmentsCount] = useState(0);
 
   const token = localStorage.getItem("token");
   const users = JSON.parse(localStorage.getItem("user"));
@@ -33,7 +34,9 @@ const Appointment = () => {
       setUser(users);
     }
   }, []);
+
   const navigation = useNavigate();
+
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
@@ -86,58 +89,27 @@ const Appointment = () => {
       setClientSecret(response?.data?.clientSecret);
       setIsAppointmentDetails(false);
       navigation("/payment", {
-        state: { appointmentId: response?.data?.appointment?.AppointmentId ,clientSecret:response?.data?.clientSecret},
+        state: {
+          appointmentId: response?.data?.appointment?.AppointmentId,
+          clientSecret: response?.data?.clientSecret,
+        },
       });
     } catch (error) {
       console.error("Error booking appointment:", error);
       alert("Error booking appointment.");
     }
   };
+  const handleDateChange = (e) => {
+    const selectedDate = e.target.value;
+    setAppointmentDate(selectedDate);
 
-  const handlePaymentSubmission = async (event) => {
-    event.preventDefault();
-    const stripe = useStripe();
-    const elements = useElements();
-  
-    if (!stripe || !elements) {
+    if (doctorAppointmentsCount >= 3) {
+      alert("Doctor already has the maximum appointments for this date.");
       return;
     }
-  
-    const cardElement = elements.getElement(CardElement);
-  
-    const { error, paymentIntent } = await stripe.confirmCardPayment(
-      clientSecret,
-      {
-        payment_method: {
-          card: cardElement,
-        },
-      }
-    );
-  
-    if (error) {
-      console.error("Payment failed", error);
-      alert("Payment failed: " + error.message);
-    } else if (paymentIntent.status === "succeeded") {
-      alert("Payment successful! Your appointment has been booked.");
-  
-     
-      try {
-        const appointmentResponse = await axios.put(
-          `http://localhost:8080/api/appoint/${appointmentId}`,
-          { status: "paid" }, 
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        navigation("/appointments"); 
-      } catch (error) {
-        console.error("Error updating appointment status:", error);
-      }
-    } else {
-      console.error("Payment not completed or status is not 'succeeded'");
-      alert("Payment was not successful. Please try again.");
-    }
   };
-  
 
+  const today = new Date().toISOString().split("T")[0];
   return (
     <>
       <Header />
@@ -251,7 +223,8 @@ const Appointment = () => {
                   type="date"
                   id="appointmentDate"
                   value={appointmentDate}
-                  onChange={(e) => setAppointmentDate(e.target.value)}
+                  onChange={handleDateChange}
+                  min={today}
                 />
               </div>
 
@@ -287,18 +260,6 @@ const Appointment = () => {
             </div>
           </div>
         )}
-
-        {/* {clientSecret && (
-          <div className="payment-form">
-            <h3>Complete Your Payment</h3>
-            <form onSubmit={handlePaymentSubmission}>
-              <CardElement />
-              <button type="submit" disabled={!clientSecret}>
-                Pay Now
-              </button>
-            </form>
-          </div>
-        )} */}
       </div>
     </>
   );

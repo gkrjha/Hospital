@@ -32,8 +32,7 @@ const AppointList = () => {
         }
       );
 
-     
-      const updatedAppointments = appointments.map((appointment) => 
+      const updatedAppointments = appointments.map((appointment) =>
         appointment.AppointmentId === appointmentId
           ? { ...appointment, status: response.data.appointment.status }
           : appointment
@@ -65,11 +64,8 @@ const AppointList = () => {
         } catch (error) {
           setError(error.message);
           setLoading(false);
-     
-          console.error('Error updating appointment status:', error);
-         
-       
-       
+
+          console.error("Error updating appointment status:", error);
         }
       };
       getAppointments();
@@ -112,17 +108,25 @@ const AppointList = () => {
                     {appointment.AppointmentType}
                   </p>
 
-                
                   <select
-                    value={selectedStatus[appointment.AppointmentId] || appointment.status}
-                    onChange={(e) => handleStatusChange(e, appointment.AppointmentId)}
+                    value={
+                      selectedStatus[appointment.AppointmentId] ||
+                      appointment.status
+                    }
+                    onChange={(e) =>
+                      handleStatusChange(e, appointment.AppointmentId)
+                    }
                   >
                     <option value="Pending">Pending</option>
                     <option value="Confirm">Confirm</option>
                     <option value="Cancle">Cancel</option>
                   </select>
 
-                  <button onClick={() => handleUpdateStatus(appointment.AppointmentId)}>
+                  <button
+                    onClick={() =>
+                      handleUpdateStatus(appointment.AppointmentId)
+                    }
+                  >
                     Update Status
                   </button>
                 </div>
@@ -138,6 +142,3 @@ const AppointList = () => {
 };
 
 export default AppointList;
-
-
-// status Confirm is working but when i cancle shownig Error: Request failed with status code 500

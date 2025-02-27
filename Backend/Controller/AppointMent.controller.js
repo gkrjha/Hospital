@@ -12,36 +12,14 @@ const stripe = new Stripe(
   "sk_test_51QtMxqFsGQXLFypacSjflqds7JoUvx4xrdRzNDQsMLhKVEFSwd0s2a8MNhyObjkUkhSDxkeDuNX6yqDaniDRVFTY00P7zUBxnV"
 );
 
-export const createPaymentIntent = async (req, res) => {
-  try {
-    const { amount } = req.body;
-
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: amount,
-      currency: "inr",
-      confirmation_method: "manual",
-      confirm: true,
-    });
-
-    res.json({
-      clientSecret: paymentIntent.client_secret,
-    });
-  } catch (error) {
-    console.error("Error creating payment intent:", error);
-    res.status(500).json({ error: "Failed to create payment intent" });
-  }
-};
-
 export const addAppointment = async (req, res) => {
-  const { user_ID, DoctorId, date, time, AppointmentType } = req.body;
-
-  if (!user_ID || !DoctorId || !date || !time || !AppointmentType) {
-    return res
-      .status(400)
-      .json({ error: "Missing required fields in request body" });
-  }
-
   try {
+    const { user_ID, DoctorId, date, time, AppointmentType } = req.body;
+
+    if (!user_ID || !DoctorId || !date || !time || !AppointmentType) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
     const timeFormatted = moment(time, "HH:mm").format("HH:mm");
 
     const patient = await Patient_Details.findOne({
@@ -52,12 +30,7 @@ export const addAppointment = async (req, res) => {
         required: true,
       },
     });
-
-    if (!patient || !patient.user) {
-      return res
-        .status(404)
-        .json({ error: "Patient or Patient's User data not found" });
-    }
+    if (!patient) return res.status(404).json({ error: "Patient not found" });
 
     const doctor = await Doctor_detail.findOne({
       where: { DoctorID: DoctorId },
@@ -67,17 +40,9 @@ export const addAppointment = async (req, res) => {
         required: true,
       },
     });
+    if (!doctor) return res.status(404).json({ error: "Doctor not found" });
 
-    if (!doctor) {
-      return res.status(404).json({ error: "Doctor not found" });
-    }
-
-    const appointmentDate = new Date(date);
-    if (isNaN(appointmentDate)) {
-      return res.status(400).json({ error: "Invalid date format" });
-    }
-
-    if (appointmentDate < new Date()) {
+    if (new Date(date) < new Date()) {
       return res
         .status(400)
         .json({ error: "Appointment date cannot be in the past" });
@@ -86,7 +51,6 @@ export const addAppointment = async (req, res) => {
     const existingAppointment = await Appointment.findOne({
       where: { user_ID, DoctorId, date },
     });
-
     if (existingAppointment) {
       return res
         .status(400)
@@ -96,28 +60,27 @@ export const addAppointment = async (req, res) => {
     const doctorAppointmentsCount = await Appointment.count({
       where: { DoctorId, date },
     });
-
-    if (doctorAppointmentsCount >= 3) {
-      return res.status(400).json({
-        error:
-          "Doctor already has 3 appointments on this date. Please choose another date.",
-      });
+    if (doctorAppointmentsCount >= 5) {
+      return res
+        .status(400)
+        .json({ error: "Doctor has reached max appointments for this date" });
     }
 
-    let appointmentAmount;
-    switch (AppointmentType) {
-      case "New Consultation":
-        appointmentAmount = 600 * 100;
-        break;
-      case "Follow-Up":
-        appointmentAmount = 400 * 100;
-        break;
-      case "Emergency":
-        appointmentAmount = 900 * 100;
-        break;
-      default:
-        return res.status(400).json({ error: "Invalid appointment type" });
+    const appointmentAmount =
+      {
+        "New Consultation": 600 * 100,
+        "Follow-Up": 400 * 100,
+        Emergency: 900 * 100,
+      }[AppointmentType] || null;
+
+    if (!appointmentAmount) {
+      return res.status(400).json({ error: "Invalid appointment type" });
     }
+
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: appointmentAmount,
+      currency: "inr",
+    });
 
     const newAppointment = await Appointment.create({
       user_ID,
@@ -125,16 +88,29 @@ export const addAppointment = async (req, res) => {
       date,
       time: timeFormatted,
       AppointmentType,
+      status: "Pending",
+      paymentIntentId: paymentIntent.id,
     });
+    const AppointmentMessage = `
+    Hello Dr. ${doctor?.user?.dataValues?.name}
+   Appointment Details
+    Patient Name: ${patient?.user?.dataValues?.name}
+    Email: ${patient?.user?.dataValues?.email}
+    Phone: ${patient?.user?.dataValues?.Phone}
+    Appointment Date:${date}}
+    Appointment Time:${time}
 
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: appointmentAmount,
-      currency: "inr",
-    });
+    Booked an Appointment
+`;
 
+    await SendPassword(
+      doctor?.user?.dataValues?.email,
+      doctor.user.dataValues.name,
+      AppointmentMessage
+    );
     res.status(201).json({
       message:
-        "Appointment created successfully, please complete your payment.",
+        "Appointment created successfully. Please complete your payment.",
       appointment: newAppointment,
       clientSecret: paymentIntent.client_secret,
     });
@@ -157,29 +133,38 @@ export const updateAppointmentStatus = async (req, res, next) => {
   try {
     const appointment = await Appointment.findOne({
       where: { AppointmentId: id },
-      include: {
-        model: User,
-        attributes: ["name", "email", "Phone"],
-        required: true,
-      },
+      include: { model: User, attributes: ["name", "email", "Phone"] },
     });
 
     if (!appointment) {
       return res.status(404).json({ error: "Appointment not found" });
     }
+
+    if (status === "Confirmed" && appointment.paymentIntentId) {
+      try {
+        const paymentIntent = await stripe.paymentIntents.confirm(
+          appointment.paymentIntentId
+        );
+        console.log("Payment confirmed:", paymentIntent);
+        appointment.paymentStatus = "Paid";
+      } catch (error) {
+        console.error("Payment confirmation failed:", error);
+        return res.status(500).json({ error: "Failed to confirm payment" });
+      }
+    }
+
+    appointment.status = status;
+    await appointment.save();
+
     const email = appointment.user.email;
     const name = appointment.user.name;
     const message = `Hello ${name}, your appointment has been updated. Your appointment Status is ${status}`;
-    const subject = "Appointment status Update";
+    const subject = "Appointment Status Update";
     SendPassword(email, name, message, subject);
-    appointment.status = status;
-    await appointment.save();
 
     res.status(200).json({
       message: "Appointment status successfully updated",
       appointment,
-      patient: appointment.Patient,
-      doctor: appointment.Doctor,
     });
   } catch (error) {
     console.error("Error updating appointment status:", error);

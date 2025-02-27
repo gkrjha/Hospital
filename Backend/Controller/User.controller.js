@@ -15,7 +15,15 @@ import { model } from "mongoose";
 dotenv.config();
 
 const { OAuth2 } = google.auth;
-const { CLIENT_ID, CLIENT_SECRET, REFRESH_TOKEN, ACCESS_TOKEN, EMAIL_USER, EMAIL_PASS, JWT_TOKEN } = process.env;
+const {
+  CLIENT_ID,
+  CLIENT_SECRET,
+  REFRESH_TOKEN,
+  ACCESS_TOKEN,
+  EMAIL_USER,
+  EMAIL_PASS,
+  JWT_TOKEN,
+} = process.env;
 
 if (!CLIENT_ID || !CLIENT_SECRET || !REFRESH_TOKEN) {
   throw new Error("Missing OAuth2 credentials.");
@@ -24,8 +32,7 @@ if (!CLIENT_ID || !CLIENT_SECRET || !REFRESH_TOKEN) {
 const auth = new OAuth2(CLIENT_ID, CLIENT_SECRET, ACCESS_TOKEN);
 auth.setCredentials({ refresh_token: REFRESH_TOKEN });
 
-
- const SendPassword = async (email, name, message,subject) => {
+const SendPassword = async (email, name, message, subject) => {
   try {
     const accessToken = await auth.getAccessToken();
 
@@ -56,7 +63,6 @@ auth.setCredentials({ refresh_token: REFRESH_TOKEN });
   }
 };
 
-
 const login = async (req, res) => {
   const { email, password } = req.body;
 
@@ -69,7 +75,7 @@ const login = async (req, res) => {
     if (!user) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
-    const data =user.UniqueId;
+    const data = user.UniqueId;
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       return res.status(400).json({ message: "Invalid credentials" });
@@ -83,21 +89,30 @@ const login = async (req, res) => {
 
     let additionalUserData = {};
     if (user.role === "Doctor") {
-      additionalUserData = await Doctor_detail.findOne({where:{user_ID:data}})
+      additionalUserData = await Doctor_detail.findOne({
+        where: { user_ID: data },
+      });
     }
 
-   
     if (user.role === "Patient") {
-      additionalUserData = await Patient_Details.findOne({where:{user_ID:data}})
-      
+      additionalUserData = await Patient_Details.findOne({
+        where: { user_ID: data },
+      });
     }
 
-    res.status(200).json({ message: "Login successful", user,additionalUserData,data,  token });
+    res
+      .status(200)
+      .json({
+        message: "Login successful",
+        user,
+        additionalUserData,
+        data,
+        token,
+      });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
-
 
 export const CountDoctor = async (req, res) => {
   try {
@@ -108,7 +123,6 @@ export const CountDoctor = async (req, res) => {
   }
 };
 
-
 export const CountPatient = async (req, res) => {
   try {
     const count = await User.count({ where: { role: "Patient" } });
@@ -117,7 +131,6 @@ export const CountPatient = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
 
 export const getDoctor = async (req, res) => {
   try {
@@ -128,27 +141,24 @@ export const getDoctor = async (req, res) => {
   }
 };
 
-
 export const getPatient = async (req, res) => {
   try {
     const patients = await User.findAll({
       where: { role: "Patient" },
       include: [
         {
-          model: Patient_Details, 
-          as: "patient_detail",   
+          model: Patient_Details,
+          as: "patient_detail",
           attributes: { exclude: [] },
-        }
-      ]
+        },
+      ],
     });
-    
+
     res.status(200).json(patients);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
-
-
 
 export const deleteUser = async (req, res) => {
   try {
@@ -178,9 +188,8 @@ export const deleteUser = async (req, res) => {
   }
 };
 
-
 const signup = async (req, res) => {
-  const { name, email, role, phone ,age,gender,specialization} = req.body;
+  const { name, email, role, phone, age, gender, specialization } = req.body;
   console.log(specialization);
   try {
     const existingUser = await User.findOne({ where: { email } });
@@ -202,23 +211,23 @@ const signup = async (req, res) => {
     if (!user) {
       throw new Error("Error creating user");
     }
-    const message = `Hello ${name} your password is ${randomPassword}`
-    await SendPassword(email, name, );
+    const subject = "";
+    const message = `Hello ${name} your password is ${randomPassword}`;
+    await SendPassword(email, name, message, subject);
 
-    let user_id = user.UniqueId
-    if(user.role=="Patient"){
-      createPatient( user_id, age, gender)
+    let user_id = user.UniqueId;
+    if (user.role == "Patient") {
+      createPatient(user_id, age, gender);
     }
-    if(user.role == "Doctor"){
+    if (user.role == "Doctor") {
       console.log(specialization);
-      createDoctor(user_id, specialization)
+      createDoctor(user_id, specialization);
     }
     res.status(200).json({ message: "Signup successful", user });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
-
 
 export const logout = async (req, res) => {
   try {
@@ -234,6 +243,4 @@ export const logout = async (req, res) => {
   }
 };
 
-
-
-export { signup, login,SendPassword };
+export { signup, login, SendPassword };

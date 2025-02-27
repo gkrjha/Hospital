@@ -1,55 +1,125 @@
-.nav-header{
-    width: 90%;
-    margin:auto ;
-    padding: auto;
-    height: 10vh;
-   display: flex;
-   justify-content: space-around;
-   align-items: center;
-}
-
-.nav-logo a{
-    cursor: pointer;
-}
-.nav-logo img{
-    height: 5vh;
-    margin: 4px;
-}
-.nav-item{
+/* Navigation Bar */
+.nav-header {
     display: flex;
     justify-content: space-between;
-}
-.nav-list-item{
-    display: flex;
-    justify-content: space-around;
-    gap: 60px;
-}
-li{
+    align-items: center;
+    background-color: #ffffff;
+    padding: 15px 30px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+  }
+  
+  /* Logo */
+  .nav-logo img {
+    height: 50px;
+  }
+  
+  /* Navigation Links */
+  .nav-list {
     list-style: none;
-    color: rgb(184, 163, 163); 
-    cursor: pointer;
-    font-family:  'Poppins', sans-serif;;
-}
-.nav-button{
     display: flex;
-    justify-content: space-around;
-    gap: 20px;
-}
-.nav-button button{
-    cursor: pointer;
-    max-height: 50px;
+    gap: 25px;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .nav-list li {
+    display: inline;
+  }
+  
+  .nav-list a {
+    text-decoration: none;
+    color: #333;
+    font-size: 16px;
+    font-weight: 600;
+    transition: color 0.3s ease-in-out;
+  }
+  
+  .nav-list a:hover {
+    color: #007bff;
+  }
+  
+  /* Login Button */
+  .login-button {
+    background-color: #007bff;
     color: white;
+    border: none;
+    padding: 8px 16px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background 0.3s ease;
+  }
+  
+  .login-button:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Profile Dropdown */
+  .profile-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 10%;
+    width: 679x;
+    height: 40px;
     display: flex;
     align-items: center;
-    padding: 8px;
-    border-radius: 10px;
-    background-color: rgb(235, 182, 84);
-}
-
-.nav-item li:hover{
-    color: orange;
-}
-
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  
+  .profile-button:hover {
+    background-color: #0056b3;
+  }
+  
+ 
+  .dropdown-menu {
+    background-color: white;
+    border: 1px solid #ddd;
+    /* width: 50px; */
+    padding: 6px;
+    margin-left: 60px;
+    margin-top: 5px;
+    border-radius: 5px;
+    min-width: 50px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .dropdown-menu .dropdown-item {
+    cursor: pointer;
+    margin-left: 80px;
+    transition: background 0.3s ease;
+  }
+ 
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .nav-header {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+  
+    .nav-list {
+      flex-direction: column;
+      gap: 10px;
+    }
+  
+    .nav-auth {
+      margin-top: 10px;
+    }
+  }
+  
+  
+  
 /* ...........................Footer............................. */
 
 .footer{ 
